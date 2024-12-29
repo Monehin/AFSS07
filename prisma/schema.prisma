@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id String @id @default(uuid())
+  clerkUserId String @unique
+  email String @unique
+  name String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  stories Story[]
+  profile profile[]
+  comments Comment[]
+  jobListings JobListing[]
+}
+
+
+model Story {
+  id String @id @default(uuid())
+  title String
+  content String
+  author User @relation(fields: [authorId], references: [clerkUserId], onDelete: Cascade)
+  authorId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  comments Comment[]
+}
+
+model profile {
+  id String @id @default(uuid())
+  name String
+  dob DateTime
+  phone String
+  career String
+  social_media_links Json
+  address String
+  city String
+  state String
+  zip String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [clerkUserId], onDelete: Cascade)
+  userId String
+}
+
+model Comment {
+  id String @id @default(uuid())
+  content String
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade) 
+  storyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JobListing {
+  id String @id @default(uuid())
+  title String
+  description String
+  company String
+  location String
+  salary String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [clerkUserId])
+  userId String
+  }
+
