@@ -18,26 +18,48 @@ const PersonalInfo = ({
 
   return (
     <div className="space-y-6">
-      <FormField
-        control={control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Name</FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Enter your name"
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e);
-                  clearErrors("name");
-                }}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="flex flex-col md:flex-row md:space-x-4">
+        <FormField
+          control={control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter your first name"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    clearErrors("firstName");
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem className="flex-1 mt-4 md:mt-0">
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter your last name"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    clearErrors("lastName");
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
       <FormField
         control={control}
         name="dob"

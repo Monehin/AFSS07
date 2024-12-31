@@ -1,7 +1,7 @@
 import { ModalProvider } from "@/components/ui/animated-modal";
 import { checkUser } from "@/lib/checkUser";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { ModeToggle } from "./ModeToggle";
+import { ThemeToggle } from "./ThemeToggle";
 import { VerifyModal } from "./modals/ProfileUpdateModal";
 const Header = async () => {
   const user = await checkUser();
@@ -34,7 +34,7 @@ const Header = async () => {
             <SignInButton />
           </SignedOut>
         </div>
-        <ModeToggle />
+        <ThemeToggle />
       </div>
     </nav>
   );

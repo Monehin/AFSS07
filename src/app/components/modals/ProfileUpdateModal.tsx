@@ -16,13 +16,13 @@ import { FormValues, formSchema } from "../Profile/ProfileSchema";
 
 export function VerifyModal() {
   const { setOpen } = useModal();
-
   const [currentStep, setCurrentStep] = useState(1);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       dob: "",
       phone: "",
       career: "",
@@ -37,7 +37,11 @@ export function VerifyModal() {
   const { trigger, handleSubmit, formState, clearErrors } = methods;
 
   const steps = [
-    { id: 1, label: "Personal Info", fields: ["name", "dob", "phone"] },
+    {
+      id: 1,
+      label: "Personal Info",
+      fields: ["firstName", "lastName", "dob", "phone"],
+    },
     { id: 2, label: "Career Info", fields: ["career", "social_media_links"] },
     {
       id: 3,
@@ -79,12 +83,13 @@ export function VerifyModal() {
   }, [setOpen]);
 
   return (
-    <div className="py-40  flex items-center justify-center">
+    <div className="py-40 flex items-center justify-center">
       <ModalBody>
         <ModalContent>
           <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-8">
             Please complete your verification by filling the form below
           </h4>
+
           {/* Step Indicator */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
@@ -93,7 +98,6 @@ export function VerifyModal() {
                   key={step.id}
                   className="flex-1 flex flex-col items-center"
                 >
-                  {/* Step Circle */}
                   <div
                     className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium ${
                       index + 1 === currentStep
@@ -105,7 +109,6 @@ export function VerifyModal() {
                   >
                     {index + 1}
                   </div>
-                  {/* Step Label */}
                   <p
                     className={`mt-2 text-sm ${
                       index + 1 <= currentStep
@@ -118,8 +121,6 @@ export function VerifyModal() {
                 </div>
               ))}
             </div>
-
-            {/* Progress Bar */}
             <div className="flex items-center mt-2">
               {steps.map((_, index) => (
                 <React.Fragment key={index}>

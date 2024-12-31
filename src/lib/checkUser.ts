@@ -23,7 +23,9 @@ export async function checkUser() {
         imageUrl: user.imageUrl,
         profile: {
           create: {
-            name: user.fullName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            fullName: user.fullName || `${user.firstName} ${user.lastName}`,
           },
         },
       },

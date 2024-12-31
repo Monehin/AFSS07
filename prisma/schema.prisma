@@ -32,7 +32,9 @@ model User {
 
 model Profile {
   id                 String    @id @default(uuid())
-  name               String?
+  firstName          String?
+  lastName           String?
+  fullName           String?
   dob                DateTime?
   phone              String?
   career             String?

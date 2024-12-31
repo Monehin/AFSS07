@@ -3,7 +3,12 @@ import { z } from "zod";
 
 // Define all schemas
 export const personalInfoSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  firstName: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters." }),
+  lastName: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters." }),
   dob: z.string().nonempty({ message: "Date of birth is required." }),
   phone: z.string().min(10, { message: "Phone must be at least 10 digits." }),
 });
