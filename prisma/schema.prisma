@@ -38,6 +38,7 @@ model Profile {
   career             String?
   social_media_links Json?
   address            String?
+  country            String?
   city               String?
   state              String?
   zip                String?

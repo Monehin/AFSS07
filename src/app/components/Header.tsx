@@ -1,10 +1,19 @@
-import React from "react";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { ModalProvider } from "@/components/ui/animated-modal";
 import { checkUser } from "@/lib/checkUser";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ModeToggle } from "./ModeToggle";
-
+import { VerifyModal } from "./modals/ProfileUpdateModal";
 const Header = async () => {
   const user = await checkUser();
+
+  if (!user?.verified) {
+    return (
+      <ModalProvider>
+        <VerifyModal />
+      </ModalProvider>
+    );
+  }
+
   return (
     <nav className="flex justify-between items-center mx-8 h-16">
       <div className="navbar-container">
