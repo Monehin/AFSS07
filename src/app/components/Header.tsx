@@ -2,14 +2,14 @@ import { ModalProvider } from "@/components/ui/animated-modal";
 import { checkUser } from "@/lib/checkUser";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "./ThemeToggle";
-import { VerifyModal } from "./modals/ProfileUpdateModal";
+import { ProfileUpdateModal } from "./modals/ProfileUpdateModal";
 const Header = async () => {
   const user = await checkUser();
 
-  if (!user?.verified) {
+  if (user && !user?.verified) {
     return (
       <ModalProvider>
-        <VerifyModal />
+        <ProfileUpdateModal />
       </ModalProvider>
     );
   }

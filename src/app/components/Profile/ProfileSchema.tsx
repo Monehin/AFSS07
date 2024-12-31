@@ -9,7 +9,9 @@ export const personalInfoSchema = z.object({
   lastName: z
     .string()
     .min(2, { message: "Name must be at least 2 characters." }),
-  dob: z.string().nonempty({ message: "Date of birth is required." }),
+  dob: z.preprocess((D) => {
+    return D ? new Date(D as Date) : undefined;
+  }, z.date().max(new Date(), { message: "Date of birth must be in the past." })),
   phone: z.string().min(10, { message: "Phone must be at least 10 digits." }),
 });
 
@@ -33,10 +35,8 @@ export const addressInfoSchema = z.object({
   zip: z.string().min(5, { message: "ZIP code must be at least 5 digits." }),
 });
 
-// Combine schemas into a single form schema
 export const formSchema = personalInfoSchema
   .merge(careerInfoSchema)
   .merge(addressInfoSchema);
 
-// Export the inferred type for use
 export type FormValues = z.infer<typeof formSchema>;

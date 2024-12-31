@@ -1,4 +1,5 @@
 "use client";
+import { updateProfile } from "@/app/actions/UpdateProfile";
 import {
   ModalBody,
   ModalContent,
@@ -6,6 +7,7 @@ import {
   useModal,
 } from "@/components/ui/animated-modal";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -14,16 +16,17 @@ import CareerInfo from "../Profile/CareerInfo";
 import PersonalInfo from "../Profile/PersonalInfo";
 import { FormValues, formSchema } from "../Profile/ProfileSchema";
 
-export function VerifyModal() {
+export const ProfileUpdateModal = () => {
   const { setOpen } = useModal();
   const [currentStep, setCurrentStep] = useState(1);
+  const { toast } = useToast();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
-      dob: "",
+      dob: new Date(),
       phone: "",
       career: "",
       social_media_links: [],
@@ -34,7 +37,7 @@ export function VerifyModal() {
       zip: "",
     },
   });
-  const { trigger, handleSubmit, formState, clearErrors } = methods;
+  const { trigger, handleSubmit, clearErrors } = methods;
 
   const steps = [
     {
@@ -56,8 +59,13 @@ export function VerifyModal() {
     const stepFields = steps[currentStep - 1].fields as StepFields;
     const isValid = await trigger(stepFields);
     if (isValid) {
-      handleSubmit((values) => {
-        console.log("Submitted Values:", values);
+      handleSubmit(async (formdata) => {
+        console.log("Submitted Values:", formdata);
+        try {
+          await updateProfile(formdata);
+        } catch (error) {
+          console.error("Failed to update profile:", error);
+        }
       })();
     }
   };
@@ -174,4 +182,4 @@ export function VerifyModal() {
       </ModalBody>
     </div>
   );
-}
+};
