@@ -6,6 +6,10 @@ import { ProfileUpdateModal } from "./modals/ProfileUpdateModal";
 const Header = async () => {
   const user = await checkUser();
 
+  if (!user) {
+    return null;
+  }
+
   if (user && !user?.verified) {
     return (
       <ModalProvider>
@@ -17,13 +21,17 @@ const Header = async () => {
   return (
     <nav className="flex justify-between items-center mx-8 h-16">
       <div className="navbar-container">
-        <h2>AFSS 2007</h2>
+        <h2 className="text-lg font-extrabold">AFSS 2007</h2>
       </div>
       <ul className="flex gap-x-8">
-        <li>Home</li>
-        <li>Members</li>
-        <li>Events</li>
-        <li>Forum</li>
+        {user && user?.verified && (
+          <>
+            <li>Home</li>
+            <li>Giggs</li>
+            <li>Events</li>
+            <li>Forum</li>
+          </>
+        )}
       </ul>
       <div className="flex items-center gap-x-8">
         <div>
