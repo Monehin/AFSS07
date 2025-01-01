@@ -19,7 +19,7 @@ export const careerInfoSchema = z.object({
   career: z
     .string()
     .min(2, { message: "Career must be at least 2 characters." }),
-  social_media_links: z.array(
+  socialMediaLinks: z.array(
     z.object({
       platform: z.string(),
       url: z.string().url({ message: "Must be a valid URL." }),

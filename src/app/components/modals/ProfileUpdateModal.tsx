@@ -1,5 +1,5 @@
 "use client";
-import { updateProfile } from "@/app/actions/UpdateProfile";
+import { getProfile, updateProfile } from "@/app/actions";
 import {
   ModalBody,
   ModalContent,
@@ -7,19 +7,19 @@ import {
   useModal,
 } from "@/components/ui/animated-modal";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import AddressInfo from "../Profile/AddressInfo";
 import CareerInfo from "../Profile/CareerInfo";
+import Confirmation from "../Profile/Confirmation";
 import PersonalInfo from "../Profile/PersonalInfo";
 import { FormValues, formSchema } from "../Profile/ProfileSchema";
 
 export const ProfileUpdateModal = () => {
   const { setOpen } = useModal();
   const [currentStep, setCurrentStep] = useState(1);
-  const { toast } = useToast();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -29,7 +29,7 @@ export const ProfileUpdateModal = () => {
       dob: new Date(),
       phone: "",
       career: "",
-      social_media_links: [],
+      socialMediaLinks: [],
       address: "",
       country: "",
       city: "",
@@ -45,11 +45,16 @@ export const ProfileUpdateModal = () => {
       label: "Personal Info",
       fields: ["firstName", "lastName", "dob", "phone"],
     },
-    { id: 2, label: "Career Info", fields: ["career", "social_media_links"] },
+    { id: 2, label: "Career", fields: ["career", "socialMediaLinks"] },
     {
       id: 3,
-      label: "Address Info",
+      label: "Address",
       fields: ["address", "country", "state", "city", "zip"],
+    },
+    {
+      id: 4,
+      label: "Verification",
+      fields: [],
     },
   ] as const;
 
@@ -63,8 +68,10 @@ export const ProfileUpdateModal = () => {
         console.log("Submitted Values:", formdata);
         try {
           await updateProfile(formdata);
+          toast.success("Profile updated successfully");
+          setCurrentStep(4);
         } catch (error) {
-          console.error("Failed to update profile:", error);
+          toast.error("Failed to update profile");
         }
       })();
     }
@@ -84,6 +91,47 @@ export const ProfileUpdateModal = () => {
   };
 
   useEffect(() => {
+    (async () => {
+      const profile = await getProfile();
+      if (profile && profile.data && !profile.error) {
+        if (
+          profile.data?.firstName &&
+          profile.data?.lastName &&
+          profile.data?.dob &&
+          profile.data?.career &&
+          profile.data?.phone &&
+          profile.data?.address &&
+          profile.data?.socialMediaLinks &&
+          profile.data?.country &&
+          profile.data?.city &&
+          profile.data?.state &&
+          profile.data?.zip
+        ) {
+          const socialMediaLinksRaw = profile.data?.socialMediaLinks;
+          const socialMediaLinks =
+            typeof socialMediaLinksRaw === "string"
+              ? JSON.parse(socialMediaLinksRaw)
+              : socialMediaLinksRaw;
+          methods.reset({
+            firstName: profile.data?.firstName,
+            lastName: profile.data?.lastName,
+            dob: new Date(profile.data?.dob),
+            phone: profile.data?.phone,
+            career: profile.data?.career,
+            socialMediaLinks: socialMediaLinks,
+            address: profile.data?.address,
+            country: profile.data?.country,
+            city: profile.data?.city,
+            state: profile.data?.state,
+            zip: profile.data?.zip,
+          });
+          setCurrentStep(4);
+        }
+      }
+    })();
+  }, [methods]);
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
       setOpen(true);
     }, 500);
@@ -94,9 +142,9 @@ export const ProfileUpdateModal = () => {
     <div className="py-40 flex items-center justify-center">
       <ModalBody>
         <ModalContent>
-          <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-8">
-            Please complete your verification by filling the form below
-          </h4>
+          <h2 className="text-lg md:text-1xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-8">
+            Fill out the form below to verify your profile
+          </h2>
 
           {/* Step Indicator */}
           <div className="mb-6">
@@ -132,13 +180,11 @@ export const ProfileUpdateModal = () => {
             <div className="flex items-center mt-2">
               {steps.map((_, index) => (
                 <React.Fragment key={index}>
-                  {index > 0 && (
-                    <div
-                      className={`flex-1 h-1 ${
-                        index < currentStep ? "bg-blue-500" : "bg-gray-300"
-                      }`}
-                    />
-                  )}
+                  <div
+                    className={`flex-1 h-1 ${
+                      index + 1 < currentStep ? "bg-blue-500" : "bg-gray-300"
+                    }`}
+                  />
                 </React.Fragment>
               ))}
             </div>
@@ -152,33 +198,36 @@ export const ProfileUpdateModal = () => {
                 )}
                 {currentStep === 2 && <CareerInfo clearErrors={clearErrors} />}
                 {currentStep === 3 && <AddressInfo clearErrors={clearErrors} />}
+                {currentStep === 4 && <Confirmation />}
               </form>
             </FormProvider>
           </div>
         </ModalContent>
-        <ModalFooter className="gap-4">
-          {currentStep > 1 && (
-            <Button variant="outline" onClick={handlePrevious}>
-              Back
-            </Button>
-          )}
-          {currentStep < 3 ? (
-            <Button
-              className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28"
-              onClick={handleNext}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button
-              className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28"
-              type="submit"
-              onClick={validateAndSubmit}
-            >
-              Submit
-            </Button>
-          )}
-        </ModalFooter>
+        {currentStep < 4 && (
+          <ModalFooter className="gap-4">
+            {currentStep > 1 && (
+              <Button variant="outline" onClick={handlePrevious}>
+                Back
+              </Button>
+            )}
+            {currentStep < 3 ? (
+              <Button
+                className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28"
+                onClick={handleNext}
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28"
+                type="submit"
+                onClick={validateAndSubmit}
+              >
+                Submit
+              </Button>
+            )}
+          </ModalFooter>
+        )}
       </ModalBody>
     </div>
   );

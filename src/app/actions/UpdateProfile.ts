@@ -1,11 +1,19 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, Profile } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
-export async function updateProfile(data: Prisma.ProfileUpdateInput) {
+interface ProfileResponse {
+  data?: Profile;
+  error?: string;
+}
+
+export async function updateProfile(
+  data: Prisma.ProfileUpdateInput
+): Promise<ProfileResponse> {
   try {
     const { userId } = await auth();
 
@@ -18,9 +26,12 @@ export async function updateProfile(data: Prisma.ProfileUpdateInput) {
       data,
     });
 
-    return updatedProfile;
+    console.log("Monehin");
+
+    revalidatePath("/");
+
+    return { data: updatedProfile };
   } catch (error) {
-    console.error("Error updating profile:", error);
-    throw new Error("Unable to update profile. Check your data and try again.");
+    return { error: "Profile update not successfull" };
   }
 }

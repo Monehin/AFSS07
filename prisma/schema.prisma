@@ -22,38 +22,36 @@ model User {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   verified    Boolean      @default(false)
-  role        String       @default("USER")
+  role        String?      @default("USER")
   stories     Story[]
   profile     Profile?     @relation("UserProfile")
   comments    Comment[]
   jobListings JobListing[]
 
-  verifiedBy   User?        @relation("UserVerification", fields: [verifiedById], references: [clerkUserId])
-  verifiedById String?      @unique  
-  verifications User[]      @relation("UserVerification") 
+  verifiedBy    User?   @relation("UserVerification", fields: [verifiedById], references: [clerkUserId])
+  verifiedById  String? @unique
+  verifications User[]  @relation("UserVerification")
 }
-
 
 model Profile {
-  id                 String    @id @default(uuid())
-  firstName          String?
-  lastName           String?
-  fullName           String?
-  dob                DateTime?
-  phone              String?
-  career             String?
-  social_media_links Json?
-  address            String?
-  country            String?
-  city               String?
-  state              String?
-  zip                String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               User      @relation("UserProfile", fields: [userId], references: [clerkUserId], onDelete: Cascade)
-  userId             String    @unique
+  id               String    @id @default(uuid())
+  firstName        String?
+  lastName         String?
+  fullName         String?
+  dob              DateTime?
+  phone            String?
+  career           String?
+  socialMediaLinks Json?
+  address          String?
+  country          String?
+  city             String?
+  state            String?
+  zip              String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation("UserProfile", fields: [userId], references: [clerkUserId], onDelete: Cascade)
+  userId           String    @unique
 }
-
 
 model Story {
   id        String    @id @default(uuid())
@@ -65,7 +63,6 @@ model Story {
   updatedAt DateTime  @updatedAt
   comments  Comment[]
 }
-
 
 model Comment {
   id        String   @id @default(uuid())

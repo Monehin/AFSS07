@@ -3,6 +3,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./globals.css";
 
@@ -39,7 +41,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Head />
-            <main className="min-h-screen">{children}</main>
+            <main className="min-h-screen mx-12">{children}</main>
+            <ToastContainer />
           </ThemeProvider>
         </body>
       </html>
