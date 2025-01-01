@@ -20,10 +20,8 @@ import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {
-  approveVerificationRequest,
-  getAllVerificationRequest,
-} from "../actions";
+import { approveVerificationRequest } from "../actions/approveVerificationRequest";
+import { getAllVerificationRequest } from "../actions/getAllVerificationRequest";
 
 const JoinRequestList = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);

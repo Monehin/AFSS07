@@ -1,5 +1,6 @@
 "use client";
-import { createProfile, getProfile } from "@/app/actions";
+import { createProfile } from "@/app/actions/createProfile";
+import { getProfile } from "@/app/actions/getProfile";
 import {
   ModalBody,
   ModalContent,

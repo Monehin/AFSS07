@@ -13,7 +13,7 @@ import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getAllVerifiedProfile } from "../actions";
+import { getAllVerifiedProfile } from "../actions/getAllVerifiedProfile";
 import JoinRequestList from "./JoinRequestList";
 import SearchBar from "./SearchBar";
 import SocialMediaList from "./SocialMediaList";
