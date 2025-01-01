@@ -71,8 +71,7 @@ const Home = () => {
           AirForce Secondary School Ikeja Class of 2007
         </p>
         <p className="md:text-base sm:text-sm text-gray-500">
-          Welcome to the class of 2007. Here you can find information about your
-          classmates.
+          Here you can find information about your classmates.
         </p>
         <div className="md:w-2/4 mt-6">
           <SearchBar onSearch={handleSearch} />
