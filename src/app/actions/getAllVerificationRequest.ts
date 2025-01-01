@@ -19,7 +19,6 @@ export async function getAllVerificationRequest(): Promise<ProfileResponse> {
 
     const joinRequests = await prisma.profile.findMany({
       where: {
-        isUpdated: true,
         user: {
           verified: false,
         },

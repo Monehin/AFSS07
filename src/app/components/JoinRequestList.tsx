@@ -6,7 +6,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 
 import {
   Table,
@@ -26,20 +25,18 @@ import {
   getAllVerificationRequest,
 } from "../actions";
 
-const JoinRequestList: React.FC<{}> = () => {
+const JoinRequestList = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     (async () => {
       try {
-        console.log("Fetching profiles");
         const profiles = await getAllVerificationRequest();
         if (!profiles?.error && profiles?.data) {
           setProfiles(profiles?.data);
         }
       } catch (error) {
-        toast.error("An error occurred while fetching profiles.", {
+        toast.error(error as string, {
           autoClose: 1000,
         });
       }
@@ -51,16 +48,13 @@ const JoinRequestList: React.FC<{}> = () => {
       const response = await approveVerificationRequest(id);
 
       if (response.error) {
-        console.error(response.error);
-        toast.error(
-          "You're not authorized to approve this profile. Contact the admin for help."
-        );
+        toast.error(response.error as string, { autoClose: 1000 });
       } else {
         toast.success("Profile updated successfully", { autoClose: 1000 });
         window.location.reload();
       }
     } catch (error) {
-      toast.error("An error occurred while approving the profile.", {
+      toast.error(error as string, {
         autoClose: 1000,
       });
     }

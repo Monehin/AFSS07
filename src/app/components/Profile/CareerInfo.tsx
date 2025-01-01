@@ -56,7 +56,7 @@ const CareerInfo = ({
       <div>
         <h3 className="text-lg font-medium mb-4">Social Media Links</h3>
         <div className="flex gap-4 mb-4">
-          {platformOptions.map(({ id, label, icon: Icon }) => (
+          {platformOptions.map(({ id, icon: Icon }) => (
             <Button
               key={id}
               variant="outline"

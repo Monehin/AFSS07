@@ -13,45 +13,57 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String       @id @default(uuid())
-  clerkUserId String       @unique
-  email       String       @unique
-  name        String?
-  imageUrl    String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  verified    Boolean      @default(false)
-  role        String?      @default("USER")
-  stories     Story[]
-  profile     Profile?     @relation("UserProfile")
-  comments    Comment[]
-  jobListings JobListing[]
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
 
-  verifiedBy    User?   @relation("UserVerification", fields: [verifiedById], references: [clerkUserId])
-  verifiedById  String? @unique
-  verifications User[]  @relation("UserVerification")
+model User {
+  id            String       @id @default(uuid())
+  clerkUserId   String       @unique
+  email         String       @unique
+  name          String?
+  imageUrl      String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  verified      Boolean      @default(false)
+  role          Role         @default(USER)
+  stories       Story[]
+  profile       Profile?     @relation("UserProfile")
+  comments      Comment[]
+  jobListings   JobListing[]
+  verifiedBy    User?        @relation("UserVerification", fields: [verifiedById], references: [clerkUserId])
+  verifiedById  String?
+  verifications User[]       @relation("UserVerification")
 }
 
 model Profile {
-  id               String    @id @default(uuid())
+  id               String            @id @default(uuid())
   firstName        String?
   lastName         String?
   fullName         String?
   dob              DateTime?
   phone            String?
   career           String?
-  socialMediaLinks Json?
   address          String?
   country          String?
   city             String?
   state            String?
   zip              String?
-  isUpdated        Boolean   @default(false)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  user             User      @relation("UserProfile", fields: [userId], references: [clerkUserId], onDelete: Cascade)
-  userId           String    @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation("UserProfile", fields: [userId], references: [clerkUserId], onDelete: Cascade)
+  userId           String            @unique
+  socialMediaLinks SocialMediaLink[] // Replace Json? with a relation
+}
+
+model SocialMediaLink {
+  id        String  @id @default(uuid())
+  platform  String
+  url       String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
 }
 
 model Story {

@@ -1,16 +1,18 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient, Profile } from "@prisma/client";
+import { PrismaClient, Profile, SocialMediaLink } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface ProfileResponse {
-  data?: Profile[];
-  error?: string;
+export interface ExtendedProfile extends Profile {
+  socialMediaLinks: SocialMediaLink[];
 }
 
-export async function getAllVerifiedProfile(): Promise<ProfileResponse> {
+export async function getAllVerifiedProfile(): Promise<{
+  data?: ExtendedProfile[];
+  error?: string;
+}> {
   try {
     const { userId } = await auth();
 
@@ -26,6 +28,7 @@ export async function getAllVerifiedProfile(): Promise<ProfileResponse> {
       },
       include: {
         user: true,
+        socialMediaLinks: true,
       },
     });
 

@@ -10,37 +10,45 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getDayandMonthDateString } from "@/lib/utils";
-import { Profile } from "@prisma/client";
+import { Profile, SocialMediaLink } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { getAllVerifiedProfile } from "../actions";
 import JoinRequestList from "./JoinRequestList";
 import SearchBar from "./SearchBar";
 import SocialMediaList from "./SocialMediaList";
 
+interface ExtendedProfile extends Profile {
+  socialMediaLinks: SocialMediaLink[];
+}
+
 const Home = () => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [profiles, setProfiles] = useState<ExtendedProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     (async () => {
       try {
-        console.log("Fetching profiles");
         const profiles = await getAllVerifiedProfile();
         if (!profiles?.error && profiles?.data) {
-          setProfiles(profiles?.data);
+          const extendedProfiles = profiles.data.map((profile) => ({
+            ...profile,
+            socialMediaLinks: profile.socialMediaLinks || [], // Ensure socialMediaLinks is always present
+          }));
+          setProfiles(extendedProfiles);
         }
       } catch (error) {
-        console.error(error);
+        toast.error(error as string, {
+          autoClose: 1000,
+        });
       }
     })();
   }, []);
 
-  // Function to handle search input
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
 
-  // Function to filter profiles based on search query
   const filteredProfiles = profiles.filter((profile) => {
     const query = searchQuery.toLowerCase();
 
@@ -100,7 +108,7 @@ const Home = () => {
                 </TableCell>
                 <TableCell>
                   <SocialMediaList
-                    socialMediaLinks={profile.socialMediaLinks as any}
+                    socialMediaLinks={profile.socialMediaLinks}
                   />
                 </TableCell>
               </TableRow>

@@ -15,16 +15,18 @@ export const personalInfoSchema = z.object({
   phone: z.string().min(10, { message: "Phone must be at least 10 digits." }),
 });
 
+const SocialMediaLinkSchema = z.object({
+  url: z.string(),
+  platform: z.string(),
+});
+
+export const SocialMediaLinksSchema = z.array(SocialMediaLinkSchema);
+
 export const careerInfoSchema = z.object({
   career: z
     .string()
     .min(2, { message: "Career must be at least 2 characters." }),
-  socialMediaLinks: z.array(
-    z.object({
-      platform: z.string(),
-      url: z.string().url({ message: "Must be a valid URL." }),
-    })
-  ),
+  socialMediaLinks: SocialMediaLinksSchema,
 });
 
 export const addressInfoSchema = z.object({

@@ -21,13 +21,6 @@ export async function checkUser() {
         email: user.primaryEmailAddress!.emailAddress,
         name: user.fullName,
         imageUrl: user.imageUrl,
-        profile: {
-          create: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            fullName: user.fullName || `${user.firstName} ${user.lastName}`,
-          },
-        },
       },
     });
 

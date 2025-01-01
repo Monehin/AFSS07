@@ -8,7 +8,7 @@ interface SocialMediaLink {
 const SocialMediaList = ({
   socialMediaLinks,
 }: {
-  socialMediaLinks: SocialMediaLink;
+  socialMediaLinks: SocialMediaLink[];
 }) => {
   return (
     <div className="flex space-x-2">
@@ -19,7 +19,6 @@ const SocialMediaList = ({
             );
             const Icon = media?.icon;
             const color = media?.color;
-            const textColor = `text-${color}`;
             if (Icon) {
               return (
                 <a

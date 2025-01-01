@@ -11,31 +11,34 @@ interface ProfileResponse {
   error?: string;
 }
 
-export async function updateProfile(
-  data: Prisma.ProfileUpdateInput
+export async function createProfile(
+  data: Prisma.ProfileCreateInput
 ): Promise<ProfileResponse> {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      throw new Error("You must be logged in to update your profile.");
+      throw new Error("You must be logged in to create your profile.");
     }
 
     if (!data.firstName || !data.lastName) {
       throw new Error("First name and last name are required.");
     }
 
-    // Combine firstName and lastName for the fullName and user's name
+    // Combine firstName and lastName for the fullName
     const fullName = `${data.firstName} ${data.lastName}`;
 
-    // Update the Profile
-    const updatedProfile = await prisma.profile.update({
+    // Check if a profile already exists for the user
+    const existingProfile = await prisma.profile.findUnique({
       where: { userId },
-      data: {
-        ...data,
-        fullName,
-      },
     });
+
+    if (existingProfile) {
+      throw new Error("A profile already exists for this user.");
+    }
+
+    // Create the Profile
+    const profile = await prisma.profile.create({ data });
 
     // Update the User name
     await prisma.user.update({
@@ -48,8 +51,8 @@ export async function updateProfile(
     // Revalidate the path to ensure the changes are reflected on the front end
     revalidatePath("/");
 
-    return { data: updatedProfile };
+    return { data: profile };
   } catch (error) {
-    return { error: `Profile update not successful: ${error}` };
+    return { error: `Profile creation not successful: ${error}` };
   }
 }

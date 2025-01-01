@@ -23,6 +23,6 @@ export async function getProfile(): Promise<ProfileResponse> {
     });
     return { data: profile || undefined };
   } catch (error) {
-    return { error: "Failed to fetch profile" };
+    return { error: error as string };
   }
 }

@@ -1,5 +1,5 @@
 "use client";
-import { getProfile, updateProfile } from "@/app/actions";
+import { createProfile, getProfile } from "@/app/actions";
 import {
   ModalBody,
   ModalContent,
@@ -7,6 +7,7 @@ import {
   useModal,
 } from "@/components/ui/animated-modal";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/clerk-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -38,6 +39,7 @@ export const ProfileUpdateModal = () => {
     },
   });
   const { trigger, handleSubmit, clearErrors } = methods;
+  const { user } = useUser();
 
   const steps = [
     {
@@ -65,13 +67,21 @@ export const ProfileUpdateModal = () => {
     const isValid = await trigger(stepFields);
     if (isValid) {
       handleSubmit(async (formdata) => {
-        console.log("Submitted Values:", formdata);
         try {
-          await updateProfile({ ...formdata, isUpdated: true });
+          await createProfile({
+            ...formdata,
+            user: { connect: { clerkUserId: user?.id } },
+            socialMediaLinks: {
+              create: formdata.socialMediaLinks.map((link) => ({
+                url: link.url,
+                platform: link.platform,
+              })),
+            },
+          });
           toast.success("Profile updated successfully", { autoClose: 1000 });
           setCurrentStep(4);
-        } catch (error) {
-          toast.error("Failed to update profile", { autoClose: 1000 });
+        } catch (err) {
+          toast.error(err as string, { autoClose: 1000 });
         }
       })();
     }
@@ -94,7 +104,7 @@ export const ProfileUpdateModal = () => {
     (async () => {
       const profile = await getProfile();
       if (profile && profile.data && !profile.error) {
-        if (profile.data?.isUpdated) {
+        if (profile.data) {
           setCurrentStep(4);
         }
       }
