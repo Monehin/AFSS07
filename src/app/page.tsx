@@ -1,16 +1,16 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { checkUser } from "@/lib/checkUser";
 import Guest from "./components/Guest";
 import Home from "./components/Home";
 
 export default async function Page() {
-  const user = await currentUser();
+  const user = await checkUser();
 
   if (!user) {
     return <Guest />;
   }
   return (
     <div className=" gap-y-12">
-      <h1 className="my-12  text-2xl">Welcome {user.firstName}</h1>
+      <h1 className="my-12  text-2xl">Welcome {user.name}</h1>
       <Home />
     </div>
   );

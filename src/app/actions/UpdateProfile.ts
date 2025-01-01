@@ -21,17 +21,36 @@ export async function updateProfile(
       throw new Error("You must be logged in to update your profile.");
     }
 
+    if (!data.firstName || !data.lastName) {
+      throw new Error("First name and last name are required.");
+    }
+
+    // Combine firstName and lastName for the fullName and user's name
+    const fullName = `${data.firstName} ${data.lastName}`;
+
+    // Update the Profile
     const updatedProfile = await prisma.profile.update({
       where: { userId },
-      data,
+      data: {
+        ...data,
+        fullName,
+      },
     });
 
-    console.log("Monehin");
+    // Update the User name
+    await prisma.user.update({
+      where: { clerkUserId: userId },
+      data: {
+        name: fullName,
+      },
+    });
 
+    // Revalidate the path to ensure the changes are reflected on the front end
     revalidatePath("/");
 
     return { data: updatedProfile };
   } catch (error) {
-    return { error: "Profile update not successfull" };
+    console.error("Error updating profile:", error);
+    return { error: "Profile update not successful" };
   }
 }

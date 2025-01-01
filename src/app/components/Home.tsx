@@ -1,4 +1,3 @@
-// pages/Home.tsx or wherever your Home component is located
 "use client";
 
 import {
@@ -10,9 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { getAllProfile } from "../actions";
+import { getAllVerifiedProfile } from "../actions";
+import JoinRequestList from "./JoinRequestList";
 import SearchBar from "./SearchBar";
 import SocialMediaList from "./SocialMediaList";
 
@@ -24,9 +25,8 @@ const Home = () => {
     (async () => {
       try {
         console.log("Fetching profiles");
-        const profiles = await getAllProfile();
+        const profiles = await getAllVerifiedProfile();
         if (!profiles?.error && profiles?.data) {
-          console.log(profiles?.data);
           setProfiles(profiles?.data);
         }
       } catch (error) {
@@ -38,14 +38,6 @@ const Home = () => {
   // Function to handle search input
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-  };
-
-  const getDayandMonthDateString = (dob: Date | null) => {
-    if (!dob) return "";
-    const date = new Date(dob);
-    const month = date.toLocaleString("default", { month: "long" });
-    const day = date.getDate();
-    return `${day} ${month}`;
   };
 
   // Function to filter profiles based on search query
@@ -66,6 +58,9 @@ const Home = () => {
 
   return (
     <div>
+      <div>
+        <JoinRequestList />
+      </div>
       <div className="flex flex-col md:justify-center md:items-center">
         <p className="md:text-2xl sm:text-xl  font-bold  mt-4">
           AirForce Secondary School Ikeja Class of 2007

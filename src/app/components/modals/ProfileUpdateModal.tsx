@@ -67,11 +67,11 @@ export const ProfileUpdateModal = () => {
       handleSubmit(async (formdata) => {
         console.log("Submitted Values:", formdata);
         try {
-          await updateProfile(formdata);
-          toast.success("Profile updated successfully");
+          await updateProfile({ ...formdata, isUpdated: true });
+          toast.success("Profile updated successfully", { autoClose: 1000 });
           setCurrentStep(4);
         } catch (error) {
-          toast.error("Failed to update profile");
+          toast.error("Failed to update profile", { autoClose: 1000 });
         }
       })();
     }
@@ -94,37 +94,7 @@ export const ProfileUpdateModal = () => {
     (async () => {
       const profile = await getProfile();
       if (profile && profile.data && !profile.error) {
-        if (
-          profile.data?.firstName &&
-          profile.data?.lastName &&
-          profile.data?.dob &&
-          profile.data?.career &&
-          profile.data?.phone &&
-          profile.data?.address &&
-          profile.data?.socialMediaLinks &&
-          profile.data?.country &&
-          profile.data?.city &&
-          profile.data?.state &&
-          profile.data?.zip
-        ) {
-          const socialMediaLinksRaw = profile.data?.socialMediaLinks;
-          const socialMediaLinks =
-            typeof socialMediaLinksRaw === "string"
-              ? JSON.parse(socialMediaLinksRaw)
-              : socialMediaLinksRaw;
-          methods.reset({
-            firstName: profile.data?.firstName,
-            lastName: profile.data?.lastName,
-            dob: new Date(profile.data?.dob),
-            phone: profile.data?.phone,
-            career: profile.data?.career,
-            socialMediaLinks: socialMediaLinks,
-            address: profile.data?.address,
-            country: profile.data?.country,
-            city: profile.data?.city,
-            state: profile.data?.state,
-            zip: profile.data?.zip,
-          });
+        if (profile.data?.isUpdated) {
           setCurrentStep(4);
         }
       }

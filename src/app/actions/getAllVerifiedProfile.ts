@@ -10,7 +10,7 @@ interface ProfileResponse {
   error?: string;
 }
 
-export async function getAllProfile(): Promise<ProfileResponse> {
+export async function getAllVerifiedProfile(): Promise<ProfileResponse> {
   try {
     const { userId } = await auth();
 
@@ -18,7 +18,17 @@ export async function getAllProfile(): Promise<ProfileResponse> {
       return { error: "You must be logged in to access profiles." };
     }
 
-    const profiles = await prisma.profile.findMany();
+    const profiles = await prisma.profile.findMany({
+      where: {
+        user: {
+          verified: true,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
     return { data: profiles };
   } catch (error: unknown) {
     const errorMessage =
