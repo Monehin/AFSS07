@@ -41,7 +41,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Head />
-            <main className="min-h-screen mx-12">{children}</main>
+            <main className="min-h-screen">{children}</main>
             <ToastContainer />
           </ThemeProvider>
         </body>

@@ -9,7 +9,7 @@ export default async function Page() {
     return <Guest />;
   }
   return (
-    <div className=" gap-y-12">
+    <div className=" gap-y-12 mx-12">
       <h1 className="my-12  text-2xl">Welcome {user.name}</h1>
       <Home />
     </div>
