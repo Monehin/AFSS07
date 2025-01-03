@@ -6,10 +6,7 @@ const Confirmation = () => (
       left—please ask someone in the WhatsApp group to approve your join
       request.
     </p>
-    <p>
-      Once approved, you’ll have full access to the site. This process ensures
-      the site remains exclusive to community members.
-    </p>
+    <p>This process ensures the site remains exclusive to community members.</p>
   </div>
 );
 

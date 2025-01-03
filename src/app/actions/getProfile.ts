@@ -1,12 +1,17 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient, Profile } from "@prisma/client";
+import { PrismaClient, Profile, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Extend Profile to include user
+export interface ProfileWithUser extends Profile {
+  user: User;
+}
+
 interface ProfileResponse {
-  data?: Profile;
+  data?: ProfileWithUser;
   error?: string;
 }
 
@@ -20,6 +25,7 @@ export async function getProfile(): Promise<ProfileResponse> {
 
     const profile = await prisma.profile.findUnique({
       where: { userId },
+      include: { user: true },
     });
     return { data: profile || undefined };
   } catch (error) {

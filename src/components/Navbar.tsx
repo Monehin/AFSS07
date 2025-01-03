@@ -1,5 +1,5 @@
 "use client";
-import { ThemeToggle } from "@/app/components/ThemeToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Menu } from "lucide-react";

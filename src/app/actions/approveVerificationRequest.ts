@@ -1,13 +1,13 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
-interface ApproveResponse {
-  success?: boolean;
+export interface ApproveResponse {
+  data?: User;
   error?: string;
 }
 
@@ -30,7 +30,7 @@ export async function approveVerificationRequest(
     }
 
     // Update the user's verified status
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { clerkUserId: userId },
       data: {
         verified: true,
@@ -39,7 +39,7 @@ export async function approveVerificationRequest(
     });
     revalidatePath("/");
 
-    return { success: true };
+    return { data: updatedUser };
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";

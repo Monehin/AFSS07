@@ -1,5 +1,6 @@
 "use client";
 
+import SkeletonWrapper from "@/components/SkeletonWrapper";
 import {
   Table,
   TableBody,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getAllVerifiedProfile } from "../actions/getAllVerifiedProfile";
@@ -25,6 +27,15 @@ interface ExtendedProfile extends Profile {
 const Home = () => {
   const [profiles, setProfiles] = useState<ExtendedProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const user = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await fetch("/api/user");
+      return response.json();
+    },
+  });
+
+  const { data, isLoading } = user;
 
   useEffect(() => {
     (async () => {
@@ -65,8 +76,11 @@ const Home = () => {
   });
 
   return (
-    <div>
+    <SkeletonWrapper isLoading={isLoading}>
       <div>
+        <h1 className="text-xl font-bold">Hello {data && data.name} 👋</h1>
+      </div>
+      <div className="my-6">
         <JoinRequestList />
       </div>
       <div className="flex flex-col md:justify-center md:items-center">
@@ -116,7 +130,7 @@ const Home = () => {
           })}
         </TableBody>
       </Table>
-    </div>
+    </SkeletonWrapper>
   );
 };
 

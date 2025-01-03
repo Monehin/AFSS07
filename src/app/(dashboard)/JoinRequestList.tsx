@@ -18,13 +18,36 @@ import {
 } from "@/components/ui/table";
 import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { approveVerificationRequest } from "../actions/approveVerificationRequest";
+import {
+  ApproveResponse,
+  approveVerificationRequest,
+} from "../actions/approveVerificationRequest";
 import { getAllVerificationRequest } from "../actions/getAllVerificationRequest";
 
 const JoinRequestList = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+
+  const mutatation = useMutation<ApproveResponse, Error, string>({
+    mutationFn: approveVerificationRequest,
+    onSuccess: ({ data, error }: ApproveResponse) => {
+      toast.success("Profile approval was successful", {
+        autoClose: 1000,
+        toastId: "approve",
+      });
+
+      setProfiles((prev) =>
+        prev.filter((profile) => profile.userId !== data?.clerkUserId)
+      );
+    },
+    onError: (error) =>
+      toast.error("Verification failed", {
+        autoClose: 1000,
+        toastId: "approve",
+      }),
+  });
 
   useEffect(() => {
     (async () => {
@@ -41,22 +64,16 @@ const JoinRequestList = () => {
     })();
   }, [setProfiles]);
 
-  const handleApprove = async (id: string) => {
-    try {
-      const response = await approveVerificationRequest(id);
-
-      if (response.error) {
-        toast.error(response.error as string, { autoClose: 1000 });
-      } else {
-        toast.success("Profile updated successfully", { autoClose: 1000 });
-        window.location.reload();
+  const handleApprove = React.useCallback(
+    async (id: string) => {
+      if (!id) {
+        toast.error("Invalid user id", { autoClose: 1000 });
+        return;
       }
-    } catch (error) {
-      toast.error(error as string, {
-        autoClose: 1000,
-      });
-    }
-  };
+      mutatation.mutateAsync(id);
+    },
+    [mutatation]
+  );
 
   return (
     <div className="mb-12">
@@ -101,6 +118,7 @@ const JoinRequestList = () => {
                       <Button
                         onClick={() => handleApprove(profile.userId)}
                         className="bg-green-500 text-white"
+                        disabled={mutatation.isPending}
                       >
                         Approve
                       </Button>
