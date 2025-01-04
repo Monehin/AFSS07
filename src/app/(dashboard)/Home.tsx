@@ -13,6 +13,7 @@ import {
 import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getAllVerifiedProfile } from "../actions/getAllVerifiedProfile";
@@ -41,7 +42,12 @@ const Home = () => {
     (async () => {
       try {
         const profiles = await getAllVerifiedProfile();
-        if (!profiles?.error && profiles?.data) {
+        console.log(profiles.error);
+
+        if (profiles?.error) {
+          redirect("/profile-setup");
+        }
+        if (profiles?.data) {
           const extendedProfiles = profiles.data.map((profile) => ({
             ...profile,
             socialMediaLinks: profile.socialMediaLinks || [], // Ensure socialMediaLinks is always present

@@ -1,4 +1,4 @@
-import { ProfileUpdateModal } from "@/components/modals/ProfileUpdateModal";
+import { ProfileSetup } from "@/app/profile-setup/ProfileSetup";
 import { currentUser } from "@clerk/nextjs/server";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { redirect } from "next/navigation";
@@ -22,7 +22,7 @@ const page = async () => {
         You can update these details later in your account settings.
       </h3>
       <Separator />
-      <ProfileUpdateModal userId={user.id} />
+      <ProfileSetup userId={user.id} />
     </div>
   );
 };

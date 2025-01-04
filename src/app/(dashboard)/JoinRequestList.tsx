@@ -32,7 +32,7 @@ const JoinRequestList = () => {
 
   const mutatation = useMutation<ApproveResponse, Error, string>({
     mutationFn: approveVerificationRequest,
-    onSuccess: ({ data, error }: ApproveResponse) => {
+    onSuccess: ({ data }: ApproveResponse) => {
       toast.success("Profile approval was successful", {
         autoClose: 1000,
         toastId: "approve",
@@ -43,7 +43,7 @@ const JoinRequestList = () => {
       );
     },
     onError: (error) =>
-      toast.error("Verification failed", {
+      toast.error(`Verification failed ${error}`, {
         autoClose: 1000,
         toastId: "approve",
       }),

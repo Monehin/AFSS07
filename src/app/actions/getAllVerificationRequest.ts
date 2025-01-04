@@ -21,6 +21,9 @@ export async function getAllVerificationRequest(): Promise<ProfileResponse> {
       where: {
         user: {
           verified: false,
+          clerkUserId: {
+            not: userId,
+          },
         },
       },
       include: {

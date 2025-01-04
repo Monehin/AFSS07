@@ -1,11 +1,9 @@
 "use server";
 
+import db from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient, Profile, User } from "@prisma/client";
+import { Profile, User } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
-// Extend Profile to include user
 export interface ProfileWithUser extends Profile {
   user: User;
 }
@@ -23,11 +21,15 @@ export async function getProfile(): Promise<ProfileResponse> {
       throw new Error("You must be logged in to update your profile.");
     }
 
-    const profile = await prisma.profile.findUnique({
+    const profile = await db.profile.findUnique({
       where: { userId },
       include: { user: true },
     });
-    return { data: profile || undefined };
+    if (profile) {
+      return { data: profile };
+    } else {
+      throw new Error("Profile not found.");
+    }
   } catch (error) {
     return { error: error as string };
   }
