@@ -27,11 +27,12 @@ const Navbar = () => {
 
 const items = [
   { label: "Home", link: "/" },
-  { label: "Giggs", link: "/giggs" },
+  { label: "Gigs", link: "/gigs" },
   { label: "Events", link: "/events" },
-  { label: "Photos", link: "/photos" },
-  { label: "Forum", link: "/forum" },
-  { label: "Donations", link: "/Donations" },
+  { label: "Pix", link: "/pix" },
+  { label: "Pulse", link: "/pulse" },
+  { label: "Donation", link: "/donation" },
+  { label: "My Profile", link: "/profile" },
 ];
 
 function DesktopNavbar() {
@@ -123,6 +124,7 @@ function MobileNavbar() {
                   label={item.label}
                   link={item.link}
                   onClick={() => setIsOpen(false)}
+                  disabled={item.active}
                 />
               ))}
             </div>
