@@ -24,8 +24,8 @@ import { toast } from "react-toastify";
 import {
   ApproveResponse,
   approveVerificationRequest,
-} from "../actions/approveVerificationRequest";
-import { getAllVerificationRequest } from "../actions/getAllVerificationRequest";
+} from "../../actions/approveVerificationRequest";
+import { getAllVerificationRequest } from "../../actions/getAllVerificationRequest";
 
 const JoinRequestList = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
