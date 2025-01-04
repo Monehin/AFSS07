@@ -6,10 +6,6 @@ const prisma = new PrismaClient();
 
 export interface ProfileWithUser extends Profile {
   user: User;
-}
-
-export interface ProfileResponse {
-  data?: ProfileWithUser;
   error?: string;
 }
 
@@ -26,6 +22,7 @@ export async function GET() {
 
     const profile = await prisma.profile.findUnique({
       where: { userId },
+      include: { user: true },
     });
 
     if (!profile) {

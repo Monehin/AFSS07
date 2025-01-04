@@ -74,24 +74,25 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
 
   type StepFields = (typeof steps)[number]["fields"];
 
-  const { data: profile, isLoading, status } = userProfile;
+  const { data: profile, isLoading } = userProfile;
 
   useEffect(() => {
     if (!userId) {
       redirect("/sign-in");
       return;
     }
-    if (status !== "success") {
+
+    if (profile?.error) {
       setCurrentStep(1);
     }
 
-    if (status === "success" && profile.user) {
-      if (profile.user.verified) {
+    if (profile?.user) {
+      if (profile?.user.verified) {
         redirect("/");
       }
       setCurrentStep(4);
     }
-  }, [profile, status, userId]);
+  }, [profile, userId]);
 
   const validateAndSubmit = async () => {
     const stepFields = steps[currentStep - 1].fields as StepFields;
