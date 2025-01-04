@@ -29,6 +29,7 @@ const items = [
   { label: "Home", link: "/" },
   { label: "Giggs", link: "/giggs" },
   { label: "Events", link: "/events" },
+  { label: "Photos", link: "/photos" },
   { label: "Forum", link: "/forum" },
   { label: "Donations", link: "/Donations" },
 ];
