@@ -26,7 +26,6 @@ export async function getUser(): Promise<UserResponse> {
     user = await db.user.create({
       data: {
         clerkUserId: clerkUser.id,
-        email: clerkUser.primaryEmailAddress!.emailAddress,
         name: clerkUser.firstName,
         imageUrl: clerkUser.imageUrl,
       },
