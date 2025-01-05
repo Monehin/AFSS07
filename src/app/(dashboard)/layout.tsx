@@ -6,7 +6,7 @@ import { getUser } from "../actions/getUser";
 const layout = async ({ children }: { children: ReactNode }) => {
   const { data: user } = await getUser();
   if (user && !user.verified) {
-    redirect("/profile-setup");
+    redirect("/onboarding");
   }
   return (
     <div className="relative flex h-screen w-full flex-col">

@@ -1,4 +1,4 @@
-import { ProfileSetup } from "@/app/profile-setup/ProfileSetup";
+import { ProfileSetup } from "@/app/onboarding/ProfileSetup";
 import { currentUser } from "@clerk/nextjs/server";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { redirect } from "next/navigation";

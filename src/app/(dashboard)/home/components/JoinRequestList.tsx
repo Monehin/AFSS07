@@ -28,7 +28,6 @@ import { ApproveResponse, verifyProfile } from "../_actions/verifyProfile";
 import SearchBar from "./SearchBar";
 import SocialMediaList from "./SocialMediaList";
 
-/** Global Approve Handler */
 const handleApprove = async (id: string) => {
   if (!id) {
     toast.error("Invalid user id", { autoClose: 1000 });
@@ -213,7 +212,7 @@ function JoinRequestTable({ profiles }: { profiles: ExtendedProfile[] }) {
               </TableCell>
               <TableCell>
                 <button
-                  onClick={() => handleApprove(profile.id)}
+                  onClick={() => handleApprove(profile.userId)}
                   aria-label={`Approve join request for ${fullName}`}
                   className="
                     flex items-center gap-1

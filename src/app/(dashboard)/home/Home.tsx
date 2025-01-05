@@ -208,7 +208,7 @@ const Home = ({ verifiedProfiles, unverifiedProfiles }: HomeProps) => {
   return (
     <div className="px-4 py-6 space-y-6">
       {/* Join Request List */}
-      {verifiedProfiles.length === 0 && (
+      {unverifiedProfiles.length > 0 && (
         <div className="mb-8">
           <JoinRequestList unverifiedProfiles={unverifiedProfiles} />
         </div>

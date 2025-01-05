@@ -1,5 +1,5 @@
 "use client";
-import { createProfile } from "@/app/profile-setup/_actions/createProfile";
+import { createProfile } from "@/app/onboarding/_actions/createProfile";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,6 +85,7 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
     if (user?.verified) {
       redirect("/");
     }
+
     if (user?.profile) {
       setCurrentStep(4);
     } else {

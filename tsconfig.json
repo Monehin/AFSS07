@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/api/profile-setup"
+    "src/app/api/onboarding"
   ],
   "exclude": ["node_modules"]
 }
