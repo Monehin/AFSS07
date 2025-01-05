@@ -21,15 +21,15 @@ import CareerInfo from "../../components/Forms/CareerInfo";
 import Confirmation from "../../components/Forms/Confirmation";
 import PersonalInfo from "../../components/Forms/PersonalInfo";
 import { FormValues, formSchema } from "../../components/Forms/ProfileSchema";
-import { ProfileWithUser } from "../api/profile/route";
+import { UserWithProfile } from "../api/user/route";
 
 export const ProfileSetup = ({ userId }: { userId: string }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const userProfile = useQuery({
-    queryKey: ["profile"],
-    queryFn: async (): Promise<ProfileWithUser> => {
-      const response = await fetch("/api/profile");
+    queryKey: ["userProfile"],
+    queryFn: async (): Promise<UserWithProfile> => {
+      const response = await fetch("/api/user");
 
       return response.json();
     },
@@ -74,7 +74,7 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
 
   type StepFields = (typeof steps)[number]["fields"];
 
-  const { data: profile, isLoading } = userProfile;
+  const { data: user, isLoading } = userProfile;
 
   useEffect(() => {
     if (!userId) {
@@ -82,17 +82,15 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
       return;
     }
 
-    if (profile?.error) {
+    if (user?.verified) {
+      redirect("/");
+    }
+    if (user?.profile) {
+      setCurrentStep(4);
+    } else {
       setCurrentStep(1);
     }
-
-    if (profile?.user) {
-      if (profile?.user.verified) {
-        redirect("/");
-      }
-      setCurrentStep(4);
-    }
-  }, [profile, userId]);
+  }, [user, userId]);
 
   const validateAndSubmit = async () => {
     const stepFields = steps[currentStep - 1].fields as StepFields;

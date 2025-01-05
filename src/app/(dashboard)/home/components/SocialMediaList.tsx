@@ -1,9 +1,6 @@
 "use client";
 import { platformOptions } from "@/utils/platformOptions";
-interface SocialMediaLink {
-  url: string;
-  platform: string;
-}
+import { SocialMediaLink } from "@prisma/client";
 
 const SocialMediaList = ({
   socialMediaLinks,
