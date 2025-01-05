@@ -15,6 +15,14 @@ export async function GET() {
     redirect("/sign-in");
   }
 
+  // Safely handle the possibility that primaryEmailAddress or emailAddress is undefined
+  const primaryEmail = clerkUser.primaryEmailAddress?.emailAddress;
+  if (!primaryEmail) {
+    throw new Error(
+      "Unable to retrieve primary email address for the current user."
+    );
+  }
+
   const foundUser = await db.user.findUnique({
     where: { clerkUserId: clerkUser.id },
     include: { profile: true },
@@ -32,7 +40,7 @@ export async function GET() {
     const created = await db.user.create({
       data: {
         clerkUserId: clerkUser.id,
-        email: clerkUser.primaryEmailAddress?.emailAddress!,
+        email: primaryEmail, // Use the safely checked `primaryEmail`
         name: clerkUser.firstName,
         imageUrl: clerkUser.imageUrl,
       },

@@ -35,7 +35,7 @@ export async function GET() {
     return NextResponse.json(profile, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "An unexpected error occurred." },
+      { error: `An unexpected error occurred. ${error}` },
       { status: 500 }
     );
   }
