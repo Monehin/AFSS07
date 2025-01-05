@@ -9,7 +9,7 @@ interface ProfileResponse {
   data?: Profile[];
   error?: string;
 }
-export async function getAllVerificationRequest(): Promise<ProfileResponse> {
+export async function getAllUnverifiedProfiles(): Promise<ProfileResponse> {
   try {
     const { userId } = await auth();
 

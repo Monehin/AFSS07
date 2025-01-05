@@ -1,5 +1,5 @@
 const page = async () => {
-  return <div className="w-[90%]">"Monehin"</div>;
+  return <div className="w-[90%]">{"Monehin"}</div>;
 };
 
 export default page;

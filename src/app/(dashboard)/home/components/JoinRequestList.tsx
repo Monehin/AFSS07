@@ -17,63 +17,45 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getDayandMonthDateString } from "@/lib/utils";
-import { Profile } from "@prisma/client";
-import { useMutation } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import {
-  ApproveResponse,
-  approveVerificationRequest,
-} from "../../actions/approveVerificationRequest";
-import { getAllVerificationRequest } from "../../actions/getAllVerificationRequest";
+import { ExtendedProfile } from "../_actions/getAllVerifiedProfiles";
+import { ApproveResponse, verifyProfile } from "../_actions/verifyProfile";
 
-const JoinRequestList = () => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+const JoinRequestList = ({
+  unverifiedProfiles,
+}: {
+  unverifiedProfiles: ExtendedProfile[];
+}) => {
+  const [profiles, setProfiles] = useState<ExtendedProfile[]>([]);
 
-  const mutatation = useMutation<ApproveResponse, Error, string>({
-    mutationFn: approveVerificationRequest,
-    onSuccess: ({ data }: ApproveResponse) => {
+  React.useEffect(() => {
+    setProfiles(unverifiedProfiles);
+  }, [unverifiedProfiles]);
+
+  const handleApprove = React.useCallback(async (id: string) => {
+    if (!id) {
+      toast.error("Invalid user id", { autoClose: 1000 });
+      return;
+    }
+
+    try {
+      const response: ApproveResponse = await verifyProfile(id);
       toast.success("Profile approval was successful", {
         autoClose: 1000,
         toastId: "approve",
       });
 
       setProfiles((prev) =>
-        prev.filter((profile) => profile.userId !== data?.clerkUserId)
+        prev.filter((profile) => profile.userId !== response?.data?.clerkUserId)
       );
-    },
-    onError: (error) =>
-      toast.error(`Verification failed ${error}`, {
+    } catch (error) {
+      toast.error(`Verification failed: ${error}`, {
         autoClose: 1000,
         toastId: "approve",
-      }),
-  });
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const profiles = await getAllVerificationRequest();
-        if (!profiles?.error && profiles?.data) {
-          setProfiles(profiles?.data);
-        }
-      } catch (error) {
-        toast.error(error as string, {
-          autoClose: 1000,
-        });
-      }
-    })();
-  }, [setProfiles]);
-
-  const handleApprove = React.useCallback(
-    async (id: string) => {
-      if (!id) {
-        toast.error("Invalid user id", { autoClose: 1000 });
-        return;
-      }
-      mutatation.mutateAsync(id);
-    },
-    [mutatation]
-  );
+      });
+    }
+  }, []);
 
   return (
     <div className="mb-12">
@@ -87,7 +69,7 @@ const JoinRequestList = () => {
           <AccordionContent>
             <Table>
               <TableCaption>
-                Only approve members you know were part of our 2007 set. If
+                Only approve members you know were part of the AFSS07 set. If
                 unsure, confirm in the WhatsApp group. Thank you!
               </TableCaption>
               <TableHeader>
@@ -118,7 +100,6 @@ const JoinRequestList = () => {
                       <Button
                         onClick={() => handleApprove(profile.userId)}
                         className="bg-green-500 text-white"
-                        disabled={mutatation.isPending}
                       >
                         Approve
                       </Button>

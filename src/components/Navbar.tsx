@@ -124,7 +124,6 @@ function MobileNavbar() {
                   label={item.label}
                   link={item.link}
                   onClick={() => setIsOpen(false)}
-                  disabled={item.active}
                 />
               ))}
             </div>

@@ -11,9 +11,7 @@ export interface ApproveResponse {
   error?: string;
 }
 
-export async function approveVerificationRequest(
-  userId: string
-): Promise<ApproveResponse> {
+export async function verifyProfile(userId: string): Promise<ApproveResponse> {
   try {
     const { userId: clerkId } = await auth();
 
