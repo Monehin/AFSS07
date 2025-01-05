@@ -18,7 +18,6 @@ export async function checkUser() {
     const newDbUser = await db.user.create({
       data: {
         clerkUserId: user.id,
-        email: user.primaryEmailAddress!.emailAddress,
         name: user.fullName,
         imageUrl: user.imageUrl,
       },

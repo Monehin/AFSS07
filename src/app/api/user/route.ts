@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export interface UserWithProfile extends User {
-  profile?: Profile; // optional, no "null"
+  profile?: Profile;
 }
 
 export async function GET() {
@@ -13,14 +13,6 @@ export async function GET() {
 
   if (!clerkUser) {
     redirect("/sign-in");
-  }
-
-  // Safely handle the possibility that primaryEmailAddress or emailAddress is undefined
-  const primaryEmail = clerkUser.primaryEmailAddress?.emailAddress;
-  if (!primaryEmail) {
-    throw new Error(
-      "Unable to retrieve primary email address for the current user."
-    );
   }
 
   const foundUser = await db.user.findUnique({
@@ -40,7 +32,6 @@ export async function GET() {
     const created = await db.user.create({
       data: {
         clerkUserId: clerkUser.id,
-        email: primaryEmail, // Use the safely checked `primaryEmail`
         name: clerkUser.firstName,
         imageUrl: clerkUser.imageUrl,
       },
