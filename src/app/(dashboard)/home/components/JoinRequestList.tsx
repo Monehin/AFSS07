@@ -22,11 +22,13 @@ import {
 import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink, User } from "@prisma/client";
 import { Check } from "lucide-react";
+import Image from "next/image";
 import { toast } from "react-toastify";
 import { ApproveResponse, verifyProfile } from "../_actions/verifyProfile";
 import SearchBar from "./SearchBar";
 import SocialMediaList from "./SocialMediaList";
 
+/** Global Approve Handler */
 const handleApprove = async (id: string) => {
   if (!id) {
     toast.error("Invalid user id", { autoClose: 1000 });
@@ -50,6 +52,7 @@ const handleApprove = async (id: string) => {
     });
   }
 };
+
 interface ExtendedProfile extends Profile {
   socialMediaLinks?: SocialMediaLink[];
   user?: User;
@@ -60,13 +63,7 @@ interface JoinRequestListProps {
 }
 
 /** Card for Mobile/Tablet */
-function JoinRequestCard({
-  profile,
-  onApprove,
-}: {
-  profile: ExtendedProfile;
-  onApprove: (id: string) => void;
-}) {
+function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
   const fullName = `${profile.firstName || "First Name"} ${
     profile.lastName || "Last Name"
   }`;
@@ -95,9 +92,11 @@ function JoinRequestCard({
         <div className="p-4 w-2/3 space-y-2 relative z-10">
           <div className="flex items-center space-x-3">
             {profile.user?.imageUrl ? (
-              <img
+              <Image
                 src={profile.user.imageUrl}
                 alt={fullName}
+                width={200}
+                height={200}
                 className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
               />
             ) : (
@@ -166,13 +165,7 @@ function JoinRequestCard({
 }
 
 /** Table for Desktop */
-function JoinRequestTable({
-  profiles,
-  onApprove,
-}: {
-  profiles: ExtendedProfile[];
-  onApprove: (id: string) => void;
-}) {
+function JoinRequestTable({ profiles }: { profiles: ExtendedProfile[] }) {
   return (
     <Table className="hidden md:table">
       <TableCaption>
@@ -220,7 +213,7 @@ function JoinRequestTable({
               </TableCell>
               <TableCell>
                 <button
-                  onClick={() => onApprove(profile.id)}
+                  onClick={() => handleApprove(profile.id)}
                   aria-label={`Approve join request for ${fullName}`}
                   className="
                     flex items-center gap-1
@@ -337,19 +330,12 @@ export default function JoinRequestList({
           {/* Mobile Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
             {filteredProfiles.map((profile) => (
-              <JoinRequestCard
-                key={profile.id}
-                profile={profile}
-                onApprove={handleApprove}
-              />
+              <JoinRequestCard key={profile.id} profile={profile} />
             ))}
           </div>
 
           {/* Desktop Table */}
-          <JoinRequestTable
-            profiles={filteredProfiles}
-            onApprove={handleApprove}
-          />
+          <JoinRequestTable profiles={filteredProfiles} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

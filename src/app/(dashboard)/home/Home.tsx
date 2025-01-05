@@ -12,6 +12,7 @@ import {
 import { getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink, User } from "@prisma/client";
 import debounce from "debounce";
+import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import JoinRequestList from "./components/JoinRequestList";
 import SearchBar from "./components/SearchBar";
@@ -57,9 +58,11 @@ const ProfileCard = ({ profile }: { profile: ExtendedProfile }) => {
         <div className="p-4 w-2/3 space-y-2 relative z-10">
           <div className="flex items-center space-x-3">
             {profile.user?.imageUrl ? (
-              <img
+              <Image
                 src={profile.user.imageUrl}
                 alt={`${profile.firstName} ${profile.lastName}`}
+                width={200}
+                height={200}
                 className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
               />
             ) : (
@@ -205,7 +208,7 @@ const Home = ({ verifiedProfiles, unverifiedProfiles }: HomeProps) => {
   return (
     <div className="px-4 py-6 space-y-6">
       {/* Join Request List */}
-      {verifiedProfiles.length > 0 && (
+      {verifiedProfiles.length === 0 && (
         <div className="mb-8">
           <JoinRequestList unverifiedProfiles={unverifiedProfiles} />
         </div>
