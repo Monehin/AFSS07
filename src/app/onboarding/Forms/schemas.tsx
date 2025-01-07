@@ -3,29 +3,22 @@ import { platformIds } from "@/utils/platformOptions";
 import { z } from "zod";
 
 export const personalInfoSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, { message: "First name must be at least 2 characters long." })
-    .max(50, { message: "First name cannot exceed 50 characters." }),
+  firstName: z.string().nonempty({ message: "First name is required." }),
 
-  lastName: z
-    .string()
-    .min(2, { message: "Last name must be at least 2 characters long." })
-    .max(50, { message: "Last name cannot exceed 50 characters." }),
+  lastName: z.string().nonempty({ message: "Last name is required." }),
 
   email: z
-    .string()
-    .email({ message: "Invalid email address." })
-    .nonempty({ message: "Email address is required." }),
+    .string({
+      required_error: "Email address is required.",
+      invalid_type_error: "Email address must be a string.",
+    })
+    .email("Invalid email address."),
 
   dob: z.preprocess((D) => {
     return D ? new Date(D as Date) : undefined;
   }, z.date().max(new Date(), { message: "Date of birth must be in the past." })),
 
-  career: z
-    .string()
-    .min(2, { message: "Career must be at least 2 characters long." })
-    .max(100, { message: "Career cannot exceed 100 characters." }),
+  career: z.string().nonempty({ message: "Career is required." }),
 });
 
 export const SocialMediaLinkSchema = z.object({
@@ -37,34 +30,18 @@ export const SocialMediaLinkSchema = z.object({
 
 // SocialMediaInfo Schema
 export const socialMediaInfoSchema = z.object({
-  socialMediaLinks: z
-    .array(SocialMediaLinkSchema)
-    .max(10, { message: "You can add up to 10 social media links." })
-    .optional()
-    .default([]),
+  socialMediaLinks: z.array(SocialMediaLinkSchema).optional().default([]),
 });
 
 // 5. **Contact Information Schema (Renamed from addressInfoSchema)**
 export const contactInfoSchema = z.object({
-  address: z
-    .string()
-    .nonempty({ message: "Address is required." })
-    .max(100, { message: "Address cannot exceed 100 characters." }),
+  address: z.string().nonempty({ message: "Address is required." }),
 
-  country: z
-    .string()
-    .nonempty({ message: "Country is required." })
-    .max(50, { message: "Country name cannot exceed 50 characters." }),
+  country: z.string().nonempty({ message: "Country is required." }),
 
-  city: z
-    .string()
-    .nonempty({ message: "City is required." })
-    .max(50, { message: "City name cannot exceed 50 characters." }),
+  city: z.string().nonempty({ message: "City is required." }),
 
-  state: z
-    .string()
-    .nonempty({ message: "State is required." })
-    .max(50, { message: "State name cannot exceed 50 characters." }),
+  state: z.string().nonempty({ message: "State is required." }),
 
   zip: z.string().regex(/^\d{5}(-\d{4})?$/, {
     message: "Invalid ZIP code format. Use '12345' or '12345-6789'.",
