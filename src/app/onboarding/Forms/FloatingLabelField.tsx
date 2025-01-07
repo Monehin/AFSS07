@@ -23,6 +23,7 @@ interface FloatingLabelFieldProps<T extends Path<FormValues>> {
   name: T;
   label: string;
   type?: React.InputHTMLAttributes<HTMLInputElement>["type"];
+  maxLength?: number; // Optional prop for character count
   clearErrors: UseFormClearErrors<FormValues>;
 }
 
@@ -38,11 +39,7 @@ function FloatingLabelField<T extends Path<FormValues>>({
     watch,
   } = useFormContext<FormValues>();
 
-  // Helper to decide if a field is "success" (value present, no error)
-  const isSuccess = () => {
-    const val = watch(name);
-    return !!val && !getNestedError(errors, name);
-  };
+  const currentValue = watch(name); // Watch the current field value
 
   // Helper function to get nested errors
   const getNestedError = (
@@ -68,7 +65,22 @@ function FloatingLabelField<T extends Path<FormValues>>({
       control={control}
       name={name}
       render={({ field }) => {
-        let fieldValue: string | number | undefined;
+        let value: string | number | undefined;
+
+        // Convert field value if needed
+        if (type === "date" && field.value instanceof Date) {
+          value = field.value.toISOString().split("T")[0];
+        } else if (
+          typeof field.value === "string" ||
+          typeof field.value === "number"
+        ) {
+          value = field.value;
+        } else {
+          value = "";
+        }
+
+        const error = getNestedError(errors, name); // Check if there's an error
+        const isValid = !error && currentValue; // Check if the field is valid
 
         return (
           <FormItem className="mb-6">
@@ -78,59 +90,48 @@ function FloatingLabelField<T extends Path<FormValues>>({
                   {...field}
                   type={type}
                   placeholder=" "
-                  value={fieldValue}
+                  value={value} // Pass valid value to the input
                   onChange={(e) => {
-                    field.onChange(
+                    const newValue =
                       type === "date"
                         ? new Date(e.target.value)
-                        : e.target.value
-                    );
+                        : e.target.value;
+                    field.onChange(newValue);
                     clearErrors(name);
                   }}
-                  className={`
-                    peer w-full
-                    appearance-none
-                    border-0 border-b border-gray-300
-                    focus-visible:ring-0
-                    pr-8
-                    pl-1.5
-                    rounded-none
-                    ${getNestedError(errors, name) ? "border-red-500" : ""}
-                  `}
+                  className={`peer w-full appearance-none border-0 border-b pr-8 pl-1.5 rounded-none focus-visible:ring-0 ${
+                    error
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : "border-gray-300 focus-visible:ring-blue-500"
+                  }`}
                 />
               </FormControl>
 
               {/* FLOATING LABEL */}
               <FormLabel
-                className={`
-                  pointer-events-none
-                  absolute left-1
-                  text-gray-500
-                  transition-all duration-200 transform
-                  ml-0.5
-                  top-2 text-base
-                  peer-focus:top-[-0.7rem]
-                  peer-focus:text-xs
-                  peer-[&:not(:placeholder-shown)]:top-[-0.7rem]
-                  peer-[&:not(:placeholder-shown)]:text-xs
-                `}
+                className={`pointer-events-none absolute left-1 transition-all duration-200 transform ml-0.5 ${
+                  value || currentValue
+                    ? "top-[-0.7rem] text-xs text-grey-500" // Floating position when input has a value
+                    : "top-2 text-base text-gray-500" // Default position
+                } peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-[-0.7rem] peer-focus:text-xs peer-focus:text-grey-500`}
               >
                 {label}
               </FormLabel>
 
-              {/* ERROR or SUCCESS ICON */}
-              {getNestedError(errors, name) ? (
+              {/* ICON: Show error or success */}
+              {error ? (
                 <AlertCircle
                   className="w-5 h-5 text-red-500 absolute right-0 top-1/2 -translate-y-1/2"
                   aria-hidden="true"
                 />
-              ) : isSuccess() ? (
+              ) : isValid ? (
                 <CheckCircle
                   className="w-5 h-5 text-green-500 absolute right-0 top-1/2 -translate-y-1/2"
                   aria-hidden="true"
                 />
               ) : null}
             </div>
+
             <FormMessage className="text-red-500 text-sm mt-1" />
           </FormItem>
         );
