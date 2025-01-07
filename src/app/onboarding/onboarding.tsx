@@ -86,11 +86,6 @@ export const Onboarding = ({ userId }: { userId: string }) => {
       label: "Social Media",
       fields: ["socialMediaInfo.socialMediaLinks"],
     },
-    {
-      id: 4,
-      label: "Verification",
-      fields: [],
-    },
   ] as const;
 
   type StepFields = (typeof steps)[number]["fields"];
@@ -164,9 +159,9 @@ export const Onboarding = ({ userId }: { userId: string }) => {
   return (
     <SkeletonWrapper isLoading={isLoading} className="h-[225px] w-full">
       <div className="flex flex-col items-center justify-center gap-y-6 w-full">
-        <div className="w-full">
+        <div className="w-full flex flex-col items-center">
           {/* Step Indicator */}
-          <div className="mb-6">
+          <div className="mb-6 w-[85%]">
             <div className="flex items-center justify-between">
               {steps.map((step, index) => (
                 <div
@@ -208,8 +203,8 @@ export const Onboarding = ({ userId }: { userId: string }) => {
               ))}
             </div>
           </div>
-          <Card className="w-full">
-            <CardContent>
+          <Card className="w-[90%]">
+            <CardContent className="p-0">
               <div className="flex justify-center items-center">
                 <FormProvider {...methods}>
                   <form className="space-y-8 w-full">
@@ -227,9 +222,9 @@ export const Onboarding = ({ userId }: { userId: string }) => {
                 </FormProvider>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="w-full flex justify-center items-center">
               {currentStep < 4 && (
-                <div className="gap-4 flex justify-end w-full">
+                <div className="gap-4 flex justify-end w-full md:w-[80%]">
                   {currentStep > 1 && (
                     <Button
                       className="w-full"

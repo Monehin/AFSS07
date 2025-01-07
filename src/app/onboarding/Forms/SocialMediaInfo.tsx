@@ -7,9 +7,10 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { platformOptions } from "@/utils/platformOptions"; // Ensure the path is correct
-import { Trash } from "lucide-react";
+import { platformOptions } from "@/utils/platformOptions";
+import { SocialIcon } from "react-social-icons";
+
+import { X } from "lucide-react";
 
 import React, { useEffect, useRef } from "react";
 import {
@@ -58,76 +59,75 @@ const SocialMediaInfo: React.FC<{
   }, [fields.length]);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-2">Social Media Information</h2>
-      <p className="text-gray-600 mb-6">Add your social media profiles.</p>
+    <div className="space-y-6 m-4  md:m-8">
+      <div className="flex flex-col justify-center items-center">
+        <h2 className="text-xl font-bold mb-2">Social Media</h2>
+        {fields.length <= 4 && (
+          <p className="text-gray-600 mb-2 font-medium">Select Platforms</p>
+        )}
+      </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Select Platforms</h3>
-        <div className="flex gap-4 mb-4 flex-wrap">
-          {platformOptions.map(
-            ({ id, icon: Icon, label, color, background }) => (
-              <Button
-                key={id}
-                variant="outline"
-                className="flex items-center gap-2 border-2"
-                onClick={() => addField(id)}
-                disabled={fields.some((field) => field.platform === id)}
-                aria-label={`Add ${label}`}
-              >
-                {background && (
-                  <span style={{ background }}>
-                    {" "}
-                    {Icon && <Icon className="w-4 h-4" />}
-                  </span>
-                )}
-                {color && (
-                  <span style={{ color }}>
-                    {" "}
-                    {Icon && <Icon className="w-4 h-4" />}
-                  </span>
-                )}
-              </Button>
-            )
-          )}
+        <div className="flex gap-1 md:gap-8 mb-4 flex-wrap justify-center">
+          {platformOptions.map(({ id, label }) => (
+            <div
+              key={id}
+              className={`flex items-center gap-2 g-x-12 cursor-pointer ${
+                fields.some((field) => field.platform === id) ? "hidden" : ""
+              }`}
+              onClick={() => addField(id)}
+              aria-label={`Add ${label}`}
+            >
+              <SocialIcon network={id} />
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="flex flex-col items-center gap-2 ">
         {fields.map((field, index) => {
           const platform = platformOptions.find(
             (option) => option.id === field.platform
           );
           if (!platform) return null;
 
-          const { icon: Icon, label, color } = platform;
+          const { icon: Icon, label, color, id } = platform;
 
           return (
             <div
               key={field.id}
-              className="flex items-center gap-4 border p-2 rounded"
+              className="flex items-center gap-4 mb-4 md:mb-8  w-[90%] md:w-[80%] "
             >
-              <div className="flex items-center gap-2" style={{ color }}>
-                {Icon && <Icon className="w-5 h-5" />}
-              </div>
-
               <FormField
                 control={control}
                 name={`socialMediaInfo.socialMediaLinks.${index}.url`}
                 render={({ field }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="flex-1 ">
                     <FormControl>
-                      <Input
-                        placeholder={`${platform.basePath}yourusername`}
-                        {...field}
-                        ref={(el) => {
-                          inputRefs.current[index] = el;
-                        }}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          clearErrors("socialMediaInfo.socialMediaLinks");
-                        }}
-                      />
+                      <div className="relative">
+                        <input
+                          type="email"
+                          className="peer py-3 pe-0 ps-10 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm !outline-none"
+                          placeholder={`${platform.basePath}yourusername`}
+                          {...field}
+                          value={field.value || ""}
+                          ref={(el) => {
+                            inputRefs.current[index] = el;
+                          }}
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            clearErrors("socialMediaInfo.socialMediaLinks");
+                          }}
+                        />
+                        <div className="absolute inset-y-0 start-[-25] flex items-center pointer-events-none ps-2 peer-disabled:opacity-50 peer-disabled:pointer-events-none">
+                          <div
+                            className="flex items-center gap-2"
+                            style={{ color }}
+                          >
+                            {Icon && <SocialIcon network={id} />}
+                          </div>
+                        </div>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -135,23 +135,17 @@ const SocialMediaInfo: React.FC<{
               />
 
               <Button
-                variant="destructive"
+                variant="outline"
                 className="ml-auto"
                 onClick={() => removeField(index)}
                 aria-label={`Remove ${label}`}
               >
-                <Trash className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </Button>
             </div>
           );
         })}
       </div>
-
-      {fields.length >= 10 && (
-        <span className="text-red-500 text-sm">
-          You can add up to 10 social media links.
-        </span>
-      )}
     </div>
   );
 };

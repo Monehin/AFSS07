@@ -1,5 +1,3 @@
-import type { Config } from "tailwindcss";
-
 const svgToDataUri = require("mini-svg-data-uri");
 
 const colors = require("tailwindcss/colors");
@@ -17,6 +15,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          primary: "#214f2d",
+          secondary: "#f9e700",
+          accent: "#e32636",
+          light: "#ffffff",
+          dark: "#000000",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

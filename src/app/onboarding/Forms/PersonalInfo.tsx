@@ -25,8 +25,9 @@ const PersonalInfo = ({
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-2">Personal Information</h2>
-      <p className="text-gray-600 mb-6">Tell us more about yourself</p>
+      <div className="flex flex-col items-center mb-4">
+        <h2 className="text-2xl font-bold mb-2">Personal Details</h2>
+      </div>
 
       {fields.map(({ name, label, type }) => (
         <FloatingLabelField

@@ -13,14 +13,8 @@ const page = async () => {
   return (
     <div className="container flex max-w-2xl flex-col items-center justify-between gap-3">
       <h1 className="text-ceter text-3xl">
-        Welcome, <span className="ml-2 font-bold">{user.firstName}! 👋</span>
+        Welcome, <span className="ml-2 font-bold ">{user.firstName}! 👋</span>
       </h1>
-      <h2 className="mt-4 text-center text-base text-muted-foreground">
-        Let &apos;s get started by providing some information about yourself.
-      </h2>
-      <h3 className="my-2 text-center text-sm text-muted-foreground">
-        You can update these details later in your account settings.
-      </h3>
       <Separator />
       <Onboarding userId={user.id} />
     </div>

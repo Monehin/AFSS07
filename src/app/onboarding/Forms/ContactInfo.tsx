@@ -29,8 +29,13 @@ const ContactInfo = ({
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-2">Contact Information</h2>
-      <p className="text-gray-600 mb-6">Provide your contact details</p>
+      <div className="flex flex-col items-center">
+        <h2 className="text-2xl font-bold mb-2">Contact Details</h2>
+        <p className="text-gray-600 text-xs mb-6 text-center">
+          Your country and city of residence will be the only details visible
+          publicly.
+        </p>
+      </div>
 
       {fields.map(({ name, label, type }) => (
         <FloatingLabelField
