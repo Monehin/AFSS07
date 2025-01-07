@@ -1,36 +1,33 @@
+// components/Forms/MainForm.tsx
+
 "use client";
 import { createProfile } from "@/app/onboarding/_actions/createProfile";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import AddressInfo from "../../components/Forms/AddressInfo";
-import CareerInfo from "../../components/Forms/CareerInfo";
-import Confirmation from "../../components/Forms/Confirmation";
-import PersonalInfo from "../../components/Forms/PersonalInfo";
-import { FormValues, formSchema } from "../../components/Forms/ProfileSchema";
 import { UserWithProfile } from "../api/user/route";
+import Confirmation from "./Forms/Confirmation";
+import ContactInfo from "./Forms/ContactInfo"; // Ensure path is correct
+import PersonalInfo from "./Forms/PersonalInfo";
+import SocialMediaInfo from "./Forms/SocialMediaInfo"; // Updated path
+import { FormValues, formSchema } from "./Forms/schemas";
 
-export const ProfileSetup = ({ userId }: { userId: string }) => {
+export const Onboarding = ({ userId }: { userId: string }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const userProfile = useQuery({
     queryKey: ["userProfile"],
     queryFn: async (): Promise<UserWithProfile> => {
       const response = await fetch("/api/user");
-
+      if (!response.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
       return response.json();
     },
   });
@@ -38,17 +35,24 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      dob: new Date(),
-      phone: "",
-      career: "",
-      socialMediaLinks: [],
-      address: "",
-      country: "",
-      city: "",
-      state: "",
-      zip: "",
+      personalInfo: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        dob: new Date(), // Changed from Date to string to match schema
+        career: "", // Retain if needed
+      },
+      socialMediaInfo: {
+        socialMediaLinks: [],
+      },
+      contactInfo: {
+        address: "",
+        country: "",
+        city: "",
+        state: "",
+        zip: "",
+        phone: "",
+      },
     },
   });
   const { trigger, handleSubmit, clearErrors } = methods;
@@ -57,13 +61,30 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
     {
       id: 1,
       label: "Personal Info",
-      fields: ["firstName", "lastName", "dob", "phone"],
+      fields: [
+        "personalInfo.firstName",
+        "personalInfo.lastName",
+        "personalInfo.email",
+        "personalInfo.dob",
+        "personalInfo.career",
+      ],
     },
-    { id: 2, label: "Career", fields: ["career", "socialMediaLinks"] },
+    {
+      id: 2,
+      label: "Contact",
+      fields: [
+        "contactInfo.address",
+        "contactInfo.country",
+        "contactInfo.city",
+        "contactInfo.state",
+        "contactInfo.zip",
+        "contactInfo.phone",
+      ],
+    },
     {
       id: 3,
-      label: "Address",
-      fields: ["address", "country", "state", "city", "zip"],
+      label: "Social Media",
+      fields: ["socialMediaInfo.socialMediaLinks"],
     },
     {
       id: 4,
@@ -96,23 +117,29 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
   const validateAndSubmit = async () => {
     const stepFields = steps[currentStep - 1].fields as StepFields;
     const isValid = await trigger(stepFields);
+    console.log(isValid);
     if (isValid) {
       handleSubmit(async (formdata) => {
-        try {
-          await createProfile({
-            ...formdata,
-            user: { connect: { clerkUserId: userId } },
-            socialMediaLinks: {
-              create: formdata.socialMediaLinks.map((link) => ({
-                url: link.url,
-                platform: link.platform,
-              })),
-            },
-          });
+        console.log(formdata);
+        const { personalInfo, contactInfo, socialMediaInfo } = formdata;
+        const formInfo = { ...personalInfo, ...contactInfo };
+        const profile = await createProfile({
+          ...formInfo,
+          user: { connect: { clerkUserId: userId } },
+          socialMediaLinks: {
+            create: socialMediaInfo.socialMediaLinks.map((link) => ({
+              url: link.url,
+              platform: link.platform,
+            })),
+          },
+        });
+        if (profile.error) {
+          console.error(profile.error);
+          toast.error(profile.error, { autoClose: 1000 });
+        }
+        if (profile.data) {
           toast.success("Profile updated successfully", { autoClose: 1000 });
           setCurrentStep(4);
-        } catch (err) {
-          toast.error(err as string, { autoClose: 1000 });
         }
       })();
     }
@@ -120,6 +147,7 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
 
   const handleNext = async () => {
     const stepFields = steps[currentStep - 1].fields as StepFields;
+
     const isValid = await trigger(stepFields);
 
     if (isValid && currentStep < steps.length) {
@@ -181,20 +209,6 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
             </div>
           </div>
           <Card className="w-full">
-            <CardHeader>
-              <CardTitle>
-                <div className="flex items-center justify-center">
-                  {currentStep === 1
-                    ? "Tell us about yourself"
-                    : currentStep === 2
-                    ? "What do you do to pay the bills (or fund your dreams)"
-                    : currentStep === 3
-                    ? "Where on this beautiful planet do you call home?"
-                    : "Request approval from a member of the community"}
-                </div>
-              </CardTitle>
-              <CardDescription></CardDescription>
-            </CardHeader>
             <CardContent>
               <div className="flex justify-center items-center">
                 <FormProvider {...methods}>
@@ -203,10 +217,10 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
                       <PersonalInfo clearErrors={clearErrors} />
                     )}
                     {currentStep === 2 && (
-                      <CareerInfo clearErrors={clearErrors} />
+                      <ContactInfo clearErrors={clearErrors} />
                     )}
                     {currentStep === 3 && (
-                      <AddressInfo clearErrors={clearErrors} />
+                      <SocialMediaInfo clearErrors={clearErrors} />
                     )}
                     {currentStep === 4 && <Confirmation />}
                   </form>
@@ -215,7 +229,7 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
             </CardContent>
             <CardFooter>
               {currentStep < 4 && (
-                <div className="gap-4  flex justify-end  w-full">
+                <div className="gap-4 flex justify-end w-full">
                   {currentStep > 1 && (
                     <Button
                       className="w-full"
@@ -235,7 +249,7 @@ export const ProfileSetup = ({ userId }: { userId: string }) => {
                   ) : (
                     <Button
                       className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-full"
-                      type="submit"
+                      type="button" // Changed from 'submit' to 'button' to prevent default form submission
                       onClick={validateAndSubmit}
                     >
                       Submit

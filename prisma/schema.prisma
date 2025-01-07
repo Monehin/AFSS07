@@ -45,6 +45,7 @@ model Profile {
   fullName         String?
   dob              DateTime?
   phone            String?
+  email            String?
   career           String?
   address          String?
   country          String?

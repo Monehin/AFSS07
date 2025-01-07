@@ -50,6 +50,6 @@ export async function updateProfile(
 
     return { data: updatedProfile };
   } catch (error) {
-    return { error: `Profile update not successful: ${error}` };
+    throw new Error(`Profile update not successful: ${error}`);
   }
 }

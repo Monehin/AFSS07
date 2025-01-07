@@ -1,4 +1,4 @@
-import { ProfileSetup } from "@/app/onboarding/ProfileSetup";
+import { Onboarding } from "@/app/onboarding/onboarding";
 import { currentUser } from "@clerk/nextjs/server";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { redirect } from "next/navigation";
@@ -22,7 +22,7 @@ const page = async () => {
         You can update these details later in your account settings.
       </h3>
       <Separator />
-      <ProfileSetup userId={user.id} />
+      <Onboarding userId={user.id} />
     </div>
   );
 };
