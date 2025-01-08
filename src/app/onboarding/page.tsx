@@ -2,12 +2,20 @@ import { Onboarding } from "@/app/onboarding/onboarding";
 import { currentUser } from "@clerk/nextjs/server";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { redirect } from "next/navigation";
+import { getProfile } from "../actions/getProfile";
+import Confirmation from "./Forms/Confirmation";
 
 const page = async () => {
   const user = await currentUser();
 
   if (!user) {
     redirect("/sign-in");
+  }
+
+  const profile = await getProfile();
+
+  if (profile.data && !profile.data.user.verified) {
+    return <Confirmation />;
   }
 
   return (

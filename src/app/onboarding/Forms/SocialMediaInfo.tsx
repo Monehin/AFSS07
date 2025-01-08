@@ -107,8 +107,8 @@ const SocialMediaInfo: React.FC<{
                       <div className="relative">
                         <input
                           type="email"
-                          className="peer py-3 pe-0 ps-10 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm !outline-none"
-                          placeholder={`${platform.basePath}yourusername`}
+                          className="peer py-3 pe-0 ps-2  block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm !outline-none"
+                          placeholder={`${platform.basePath}username`}
                           {...field}
                           value={field.value || ""}
                           ref={(el) => {
@@ -121,7 +121,7 @@ const SocialMediaInfo: React.FC<{
                         />
                         <div className="absolute inset-y-0 start-[-25] flex items-center pointer-events-none ps-2 peer-disabled:opacity-50 peer-disabled:pointer-events-none">
                           <div
-                            className="flex items-center gap-2"
+                            className=" items-center gap-2 hidden"
                             style={{ color }}
                           >
                             {Icon && <SocialIcon network={id} />}
