@@ -42,13 +42,11 @@ const FormSchema = z.object({
 });
 
 export function SimpleForm() {
-  const [date, setDate] = React.useState<Date>();
-  const [countries, setCountries] = React.useState(Country.getAllCountries());
+  const [countries] = React.useState(Country.getAllCountries());
   const [states, setStates] = React.useState<IState[]>([]);
   const [selectedCountry, setSelectedCountry] = React.useState<string | null>(
     null
   );
-  const [selectedState, setSelectedState] = React.useState<string | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -66,7 +64,7 @@ export function SimpleForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-3">
         {/* Country Field */}
         <FormField
           control={form.control}
@@ -118,7 +116,6 @@ export function SimpleForm() {
               <Select
                 onValueChange={(value) => {
                   field.onChange(value);
-                  setSelectedState(value);
                 }}
                 defaultValue={field.value}
                 disabled={!selectedCountry}
@@ -186,8 +183,8 @@ export function SimpleForm() {
             </FormItem>
           )}
         />
-
-        <Button className="w-full" type="submit">
+        <br />
+        <Button className="w-full " type="submit">
           Submit
         </Button>
       </form>
