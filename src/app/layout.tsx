@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
 
 import React from "react";
+import "react-day-picker/style.css";
 import RootProviders from "../components/providers/RootProviders";
 import "./globals.css";
 

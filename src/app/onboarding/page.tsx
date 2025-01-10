@@ -1,9 +1,9 @@
-import { Onboarding } from "@/app/onboarding/onboarding";
 import { currentUser } from "@clerk/nextjs/server";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { redirect } from "next/navigation";
 import { getProfile } from "../actions/getProfile";
 import Confirmation from "./Forms/Confirmation";
+import { SimpleForm } from "./Forms/SimpleForm";
 
 const page = async () => {
   const user = await currentUser();
@@ -24,7 +24,7 @@ const page = async () => {
         Welcome, <span className="ml-2 font-bold ">{user.firstName}! 👋</span>
       </h1>
       <Separator />
-      <Onboarding userId={user.id} />
+      <SimpleForm />
     </div>
   );
 };
