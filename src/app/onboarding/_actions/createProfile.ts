@@ -35,9 +35,10 @@ export async function createProfile(
     const profile = await prisma.profile.create({
       data: {
         ...data,
-        firstName: user.firstName || user.fullName,
-        lastName: user.lastName,
-        imageUrl: user.imageUrl,
+        firstName: user.firstName || user.fullName || "anonymous",
+        lastName: user.lastName || undefined,
+        imageUrl: user.imageUrl || undefined,
+        user: { connect: { clerkUserId: user.id } },
       },
     });
 

@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { getProfile } from "../actions/getProfile";
 import Confirmation from "./Forms/Confirmation";
 import { Onboarding } from "./onboarding";
+import { getUser } from "../actions/getUser";
 
 const page = async () => {
   const user = await currentUser();
+  await getUser();
 
   if (!user) {
     redirect("/sign-in");
@@ -16,6 +18,10 @@ const page = async () => {
 
   if (profile.data && !profile.data.user.verified) {
     return <Confirmation />;
+  }
+
+  if (profile.data && profile.data.user.verified) {
+    redirect("/");
   }
 
   return (
