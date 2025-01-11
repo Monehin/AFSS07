@@ -22,7 +22,7 @@ enum Role {
 model User {
   id            String       @id @default(uuid())
   clerkUserId   String       @unique
-  email         String?       @unique
+  email         String?      @unique
   name          String?
   imageUrl      String?
   createdAt     DateTime     @default(now())
@@ -43,6 +43,7 @@ model Profile {
   firstName        String?
   lastName         String?
   fullName         String?
+  imageUrl         String?
   dob              DateTime?
   phone            String?
   email            String?
