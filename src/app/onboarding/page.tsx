@@ -3,7 +3,7 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 import { redirect } from "next/navigation";
 import { getProfile } from "../actions/getProfile";
 import Confirmation from "./Forms/Confirmation";
-import { SimpleForm } from "./Forms/SimpleForm";
+import { Onboarding } from "./onboarding";
 
 const page = async () => {
   const user = await currentUser();
@@ -24,7 +24,7 @@ const page = async () => {
         Welcome, <span className="ml-2 font-bold ">{user.firstName}! 👋</span>
       </h1>
       <Separator />
-      <SimpleForm />
+      <Onboarding userId={user.id} />
     </div>
   );
 };
