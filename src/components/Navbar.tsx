@@ -27,11 +27,11 @@ const Navbar = () => {
 
 const items = [
   { label: "Home", link: "/" },
-  { label: "Gigs", link: "/gigs" },
-  { label: "Events", link: "/events" },
-  { label: "Pix", link: "/pix" },
-  { label: "Pulse", link: "/pulse" },
-  { label: "Donation", link: "/donation" },
+  // { label: "Gigs", link: "/gigs" },
+  // { label: "Events", link: "/events" },
+  // { label: "Pix", link: "/pix" },
+  // { label: "Pulse", link: "/pulse" },
+  // { label: "Donation", link: "/donation" },
   { label: "My Profile", link: "/profile" },
 ];
 

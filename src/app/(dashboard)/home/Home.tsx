@@ -17,6 +17,7 @@ import { useCallback, useMemo, useState } from "react";
 import JoinRequestList from "./components/JoinRequestList";
 import SearchBar from "./components/SearchBar";
 import SocialMediaList from "./components/SocialMediaList";
+import { ProfileWithUser } from "@/app/actions/getProfile";
 
 /** Types & Interfaces */
 interface ExtendedProfile extends Profile {
@@ -27,7 +28,112 @@ interface ExtendedProfile extends Profile {
 interface HomeProps {
   verifiedProfiles: ExtendedProfile[];
   unverifiedProfiles: ExtendedProfile[];
+  userProfile: ProfileWithUser | undefined;
 }
+
+/** Main Home Component */
+const Home = ({
+  verifiedProfiles,
+  unverifiedProfiles,
+  userProfile,
+}: HomeProps) => {
+  // State for search query and "is searching" feedback
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  // Debounce the search input to avoid rapid re-renders
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((query: string) => {
+        setSearchQuery(query);
+        setIsSearching(false);
+      }, 300),
+    []
+  );
+
+  const handleSearch = useCallback(
+    (query: string) => {
+      // Show “search in progress” feedback
+      setIsSearching(true);
+      debouncedSearch(query);
+    },
+    [debouncedSearch]
+  );
+
+  // Filter the verified profiles by search query
+  const filteredProfiles = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return verifiedProfiles;
+
+    return verifiedProfiles.filter((profile) =>
+      [
+        profile.firstName,
+        profile.lastName,
+        profile.career,
+        profile.country,
+        profile.state,
+        profile.dob ? getDayandMonthDateString(profile.dob) : "",
+      ]
+        .filter(Boolean)
+        .some((field) => field?.toLowerCase().includes(query))
+    );
+  }, [verifiedProfiles, searchQuery]);
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchQuery("");
+    setIsSearching(false);
+  };
+
+  return (
+    <div className="px-4 py-6 space-y-6">
+      {" "}
+      {userProfile?.firstName ? (
+        <h1 className="text-2xl font-bold">
+          Welcome, {userProfile.firstName} 👋
+        </h1>
+      ) : null}
+      {/* Join Request List */}
+      {unverifiedProfiles.length > 0 && (
+        <div className="mb-8">
+          <JoinRequestList unverifiedProfiles={unverifiedProfiles} />
+        </div>
+      )}
+      {/* Header */}
+      <div className="">
+        <p className="text-base  font-bold">AFSS07 Members </p>
+        <p className="text-sm sm:text-base text-gray-500">
+          {verifiedProfiles.length} members
+        </p>
+      </div>
+      <div className="max-w-md mb-4 flex flex-col items-center gap-2">
+        <div className="w-full">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+        {isSearching && <p className="text-xs text-gray-500">Searching...</p>}
+
+        {searchQuery && (
+          <button
+            onClick={clearSearch}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Clear Search
+          </button>
+        )}
+      </div>
+      {/* Mobile/Tablet Profiles in grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
+        {filteredProfiles.map((profile) => (
+          <ProfileCard key={profile.id} profile={profile} />
+        ))}
+      </div>
+      {/* Desktop View */}
+      <ProfileTable profiles={filteredProfiles} />
+    </div>
+  );
+};
+
+export default Home;
 
 /** ProfileCard Component */
 const ProfileCard = ({ profile }: { profile: ExtendedProfile }) => {
@@ -154,101 +260,3 @@ const ProfileTable = ({ profiles }: { profiles: ExtendedProfile[] }) => {
     </Table>
   );
 };
-
-/** Main Home Component */
-const Home = ({ verifiedProfiles, unverifiedProfiles }: HomeProps) => {
-  // State for search query and "is searching" feedback
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-
-  // Debounce the search input to avoid rapid re-renders
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((query: string) => {
-        setSearchQuery(query);
-        setIsSearching(false);
-      }, 300),
-    []
-  );
-
-  const handleSearch = useCallback(
-    (query: string) => {
-      // Show “search in progress” feedback
-      setIsSearching(true);
-      debouncedSearch(query);
-    },
-    [debouncedSearch]
-  );
-
-  // Filter the verified profiles by search query
-  const filteredProfiles = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return verifiedProfiles;
-
-    return verifiedProfiles.filter((profile) =>
-      [
-        profile.firstName,
-        profile.lastName,
-        profile.career,
-        profile.country,
-        profile.state,
-        profile.dob ? getDayandMonthDateString(profile.dob) : "",
-      ]
-        .filter(Boolean)
-        .some((field) => field?.toLowerCase().includes(query))
-    );
-  }, [verifiedProfiles, searchQuery]);
-
-  // Clear search
-  const clearSearch = () => {
-    setSearchQuery("");
-    setIsSearching(false);
-  };
-
-  return (
-    <div className="px-4 py-6 space-y-6">
-      {/* Join Request List */}
-      {unverifiedProfiles.length > 0 && (
-        <div className="mb-8">
-          <JoinRequestList unverifiedProfiles={unverifiedProfiles} />
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="">
-        <p className="text-base  font-bold">AFSS07 Members </p>
-        <p className="text-sm sm:text-base text-gray-500">
-          {verifiedProfiles.length} members
-        </p>
-      </div>
-
-      <div className="max-w-md mb-4 flex flex-col items-center gap-2">
-        <div className="w-full">
-          <SearchBar onSearch={handleSearch} />
-        </div>
-        {isSearching && <p className="text-xs text-gray-500">Searching...</p>}
-
-        {searchQuery && (
-          <button
-            onClick={clearSearch}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Clear Search
-          </button>
-        )}
-      </div>
-
-      {/* Mobile/Tablet Profiles in grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
-        {filteredProfiles.map((profile) => (
-          <ProfileCard key={profile.id} profile={profile} />
-        ))}
-      </div>
-
-      {/* Desktop View */}
-      <ProfileTable profiles={filteredProfiles} />
-    </div>
-  );
-};
-
-export default Home;
