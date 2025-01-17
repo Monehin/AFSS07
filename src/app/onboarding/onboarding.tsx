@@ -1,16 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Country, IState, State } from "country-state-city";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Country } from "country-state-city";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -20,23 +16,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { createProfile } from "./_actions/createProfile";
 
 const FormSchema = z.object({
   country: z.string().nonempty({ message: "Country is required." }),
-  state: z.string().nonempty({ message: "State is required." }),
   dob: z.preprocess((D) => {
     return D ? new Date(D as Date) : undefined;
   }, z.date().max(new Date(), { message: "Date of birth must be in the past." })),
@@ -44,37 +33,44 @@ const FormSchema = z.object({
 
 export function Onboarding({ userId }: { userId: string }) {
   const [countries] = React.useState(Country.getAllCountries());
-  const [states, setStates] = React.useState<IState[]>([]);
-  const [selectedCountry, setSelectedCountry] = React.useState<string | null>(
-    null
-  );
+  const [selectedCountryIso, setSelectedCountryIso] = React.useState("");
+  const [loading, setLoading] = React.useState(false); // Loading state
 
+  const date = new Date();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       country: "",
-      state: "",
-      dob: undefined,
+      dob: date,
     },
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast("Form submitted successfully!");
-    console.log(data);
-    const profile = await createProfile({
-      ...data,
-      user: { connect: { clerkUserId: userId } },
-    });
-    if (profile.error) {
-      console.error(profile.error);
-      toast.error(profile.error, { autoClose: 1000 });
+    setLoading(true); // Set loading to true
+    try {
+      const profile = await createProfile({
+        ...data,
+        user: { connect: { clerkUserId: userId } },
+      });
+
+      if (profile.error) {
+        toast.error(profile.error, { autoClose: 1000 });
+      } else {
+        toast("Form submitted successfully!", {
+          onClose: () => setLoading(false), // Reset loading after toast finishes
+        });
+      }
+    } catch (error) {
+      toast.error("An error occurred while submitting the form.", {
+        autoClose: 1000,
+      });
+      setLoading(false); // Reset loading on error
     }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-3">
-        {/* Country Field */}
         <FormField
           control={form.control}
           name="country"
@@ -82,20 +78,11 @@ export function Onboarding({ userId }: { userId: string }) {
             <FormItem className="flex flex-col">
               <FormLabel>Country of Residence</FormLabel>
               <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  setSelectedCountry(value);
-                  const country = countries.find((c) => c.name === value);
-                  if (country) {
-                    const countryStates = State.getStatesOfCountry(
-                      country.isoCode
-                    );
-                    setStates(countryStates);
-                  } else {
-                    setStates([]);
-                  }
+                onValueChange={(isoCode) => {
+                  field.onChange(isoCode);
+                  setSelectedCountryIso(isoCode);
                 }}
-                defaultValue={field.value}
+                value={field.value || ""}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -104,7 +91,7 @@ export function Onboarding({ userId }: { userId: string }) {
                 </FormControl>
                 <SelectContent>
                   {countries.map((country) => (
-                    <SelectItem key={country.isoCode} value={country.name}>
+                    <SelectItem key={country.isoCode} value={country.isoCode}>
                       {country.name}
                     </SelectItem>
                   ))}
@@ -115,86 +102,32 @@ export function Onboarding({ userId }: { userId: string }) {
           )}
         />
 
-        {/* State Field */}
-        <FormField
-          control={form.control}
-          name="state"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>State</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                }}
-                defaultValue={field.value}
-                disabled={!selectedCountry}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a state" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {states.map((state) => (
-                    <SelectItem key={state.isoCode} value={state.name}>
-                      {state.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Date of Birth Field */}
         <FormField
           control={form.control}
           name="dob"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of Birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-[full] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={(date) => {
-                      if (date) {
-                        field.onChange(date);
-                      }
-                    }}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <input
+                  type="date"
+                  id="dob"
+                  value={field.value.toString() ?? ""}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="border border-gray-300 rounded px-2 py-1"
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <br />
-        <Button className="w-full" type="submit">
-          Submit
+
+        <Button
+          className="w-full"
+          type="submit"
+          disabled={loading || !form.formState.isDirty}
+        >
+          {loading ? "Submitting..." : "Submit"}
         </Button>
       </form>
     </Form>
