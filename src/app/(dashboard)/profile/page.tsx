@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, SignedIn } from "@clerk/nextjs";
 import Image from "next/image";
-import { updateProfile } from "../../actions/updateProfile";
+import { updateProfile } from "@/app/actions/updateProfile";
 import { Save, UploadCloud } from "lucide-react";
 import {
   Country,
