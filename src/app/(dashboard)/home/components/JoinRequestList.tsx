@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getDayandMonthDateString } from "@/lib/utils";
+import { getCountryName, getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink, User } from "@prisma/client";
 import { Check } from "lucide-react";
 import Image from "next/image";
@@ -42,12 +42,10 @@ const handleApprove = async (id: string) => {
     }
     toast.success("Profile approval was successful", {
       autoClose: 1000,
-      toastId: "approve",
     });
   } catch (error) {
     toast.error(`Verification failed: ${error}`, {
       autoClose: 1000,
-      toastId: "approve",
     });
   }
 };
@@ -124,8 +122,7 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
             </p>
             <p>
               <span className="font-medium">Location:</span>{" "}
-              {profile.state || "State not specified"},{" "}
-              {profile.country || "Country not specified"}
+              {getCountryName(profile.country) || "Country not specified"}
             </p>
           </div>
         </div>
@@ -197,8 +194,7 @@ function JoinRequestTable({ profiles }: { profiles: ExtendedProfile[] }) {
               </TableCell>
               <TableCell>{profile.career || "Not specified"}</TableCell>
               <TableCell>
-                {profile.state || "State not specified"},{" "}
-                {profile.country || "Country not specified"}
+                {getCountryName(profile.country) || "Country not specified"}
               </TableCell>
               <TableCell>
                 {profile.socialMediaLinks &&
@@ -241,21 +237,18 @@ export default function JoinRequestList({
 }: JoinRequestListProps) {
   /** Search-related state */
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
 
   // Debounce search to reduce rapid re-renders
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
         setSearchQuery(query);
-        setIsSearching(false);
       }, 300),
     []
   );
 
   const handleSearch = useCallback(
     (query: string) => {
-      setIsSearching(true);
       debouncedSearch(query);
     },
     [debouncedSearch]
@@ -271,20 +264,13 @@ export default function JoinRequestList({
         profile.firstName,
         profile.lastName,
         profile.career,
-        profile.country,
-        profile.state,
+        getCountryName(profile.country),
         profile.dob ? getDayandMonthDateString(profile.dob) : "",
       ]
         .filter(Boolean)
         .some((field) => field?.toLowerCase().includes(query))
     );
   }, [unverifiedProfiles, searchQuery]);
-
-  /** Clear search */
-  const clearSearch = () => {
-    setSearchQuery("");
-    setIsSearching(false);
-  };
 
   return (
     <Accordion
@@ -313,17 +299,6 @@ export default function JoinRequestList({
           {/* Search Bar & Clear Button */}
           <div className="max-w-md mb-4">
             <SearchBar onSearch={handleSearch} />
-            {isSearching && (
-              <p className="text-xs text-gray-500 mt-1">Searching...</p>
-            )}
-            {searchQuery && (
-              <button
-                onClick={clearSearch}
-                className="text-sm text-blue-600 hover:underline mt-1"
-              >
-                Clear Search
-              </button>
-            )}
           </div>
 
           {/* Mobile Cards */}

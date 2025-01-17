@@ -33,7 +33,6 @@ const FormSchema = z.object({
 
 export function Onboarding({ userId }: { userId: string }) {
   const [countries] = React.useState(Country.getAllCountries());
-  const [selectedCountryIso, setSelectedCountryIso] = React.useState("");
   const [loading, setLoading] = React.useState(false); // Loading state
 
   const date = new Date();
@@ -61,7 +60,7 @@ export function Onboarding({ userId }: { userId: string }) {
         });
       }
     } catch (error) {
-      toast.error("An error occurred while submitting the form.", {
+      toast.error(`An error occurred while submitting the form., ${error}`, {
         autoClose: 1000,
       });
       setLoading(false); // Reset loading on error
@@ -80,7 +79,6 @@ export function Onboarding({ userId }: { userId: string }) {
               <Select
                 onValueChange={(isoCode) => {
                   field.onChange(isoCode);
-                  setSelectedCountryIso(isoCode);
                 }}
                 value={field.value || ""}
               >

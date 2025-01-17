@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getDayandMonthDateString } from "@/lib/utils";
+import { getCountryName, getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink, User } from "@prisma/client";
 import debounce from "debounce";
 import Image from "next/image";
@@ -39,14 +39,12 @@ const Home = ({
 }: HomeProps) => {
   // State for search query and "is searching" feedback
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   // Debounce the search input to avoid rapid re-renders
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
         setSearchQuery(query);
-        setIsSearching(false);
       }, 300),
     []
   );
@@ -54,7 +52,6 @@ const Home = ({
   const handleSearch = useCallback(
     (query: string) => {
       // Show “search in progress” feedback
-      setIsSearching(true);
       debouncedSearch(query);
     },
     [debouncedSearch]
@@ -70,7 +67,7 @@ const Home = ({
         profile.firstName,
         profile.lastName,
         profile.career,
-        profile.country,
+        getCountryName(profile.country || ""),
         profile.state,
         profile.dob ? getDayandMonthDateString(profile.dob) : "",
       ]
@@ -78,12 +75,6 @@ const Home = ({
         .some((field) => field?.toLowerCase().includes(query))
     );
   }, [verifiedProfiles, searchQuery]);
-
-  // Clear search
-  const clearSearch = () => {
-    setSearchQuery("");
-    setIsSearching(false);
-  };
 
   return (
     <div className="px-4 py-6 space-y-6">
@@ -110,16 +101,6 @@ const Home = ({
         <div className="w-full">
           <SearchBar onSearch={handleSearch} />
         </div>
-        {isSearching && <p className="text-xs text-gray-500">Searching...</p>}
-
-        {searchQuery && (
-          <button
-            onClick={clearSearch}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Clear Search
-          </button>
-        )}
       </div>
       {/* Mobile/Tablet Profiles in grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
@@ -198,8 +179,7 @@ const ProfileCard = ({ profile }: { profile: ExtendedProfile }) => {
             </p>
             <p>
               <span className="font-medium">Location:</span>{" "}
-              {profile.state || "State not specified"},{" "}
-              {profile.country || "Country not specified"}
+              {getCountryName(profile.country) || "Country not specified"}
             </p>
           </div>
         </div>
@@ -246,8 +226,7 @@ const ProfileTable = ({ profiles }: { profiles: ExtendedProfile[] }) => {
             </TableCell>
             <TableCell>{profile.career || "Not specified"}</TableCell>
             <TableCell>
-              {profile.state || "State not specified"},{" "}
-              {profile.country || "Country not specified"}
+              {getCountryName(profile.country) || "Country not specified"}
             </TableCell>
             <TableCell>
               {profile.socialMediaLinks && (
