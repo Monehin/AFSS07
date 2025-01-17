@@ -146,7 +146,9 @@ const ProfileCard = ({ profile }: { profile: ExtendedProfile }) => {
           <div className="flex items-center space-x-3">
             {profile.user?.imageUrl ? (
               <Image
-                src={profile.user.imageUrl}
+                src={
+                  profile.imageUrl ? profile.imageUrl : profile.user.imageUrl
+                }
                 alt={`${profile.firstName} ${profile.lastName}`}
                 width={200}
                 height={200}
