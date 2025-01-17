@@ -285,7 +285,9 @@ export default function ProfilePageTabs() {
             <CardTitle className="text-xl font-semibold">
               Profile Details
             </CardTitle>
-            <CardDescription>Edit your profile in tabs</CardDescription>
+            <CardDescription>
+              Update your details and click <b>save</b> to apply changes.
+            </CardDescription>
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
