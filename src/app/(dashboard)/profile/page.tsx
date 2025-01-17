@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, SignedIn } from "@clerk/nextjs";
 import Image from "next/image";
+import { updateProfile } from "@/app/actions/updateProfile";
 import { Save, UploadCloud } from "lucide-react";
 import {
   Country,
@@ -36,7 +37,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "react-toastify";
-import { updateProfile } from "@/app/actions/updateProfile";
 
 interface SocialMediaLink {
   platform: string;
