@@ -2,7 +2,7 @@
 
 import { UseFormClearErrors } from "react-hook-form";
 import FloatingLabelField from "./FloatingLabelField";
-import { FormValues } from "./schemas";
+import { FormValues } from "../../../utils/schemas";
 
 const PersonalInfo = ({
   clearErrors,

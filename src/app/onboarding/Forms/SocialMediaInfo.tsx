@@ -18,7 +18,7 @@ import {
   useFieldArray,
   useFormContext,
 } from "react-hook-form";
-import { FormValues } from "./schemas"; // Adjust the import path as needed
+import { FormValues } from "../../../utils/schemas"; // Adjust the import path as needed
 
 const SocialMediaInfo: React.FC<{
   clearErrors: UseFormClearErrors<FormValues>;

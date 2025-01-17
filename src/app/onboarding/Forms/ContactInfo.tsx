@@ -3,7 +3,7 @@
 
 import { UseFormClearErrors } from "react-hook-form";
 import FloatingLabelField from "./FloatingLabelField"; // Adjust the import path as needed
-import { FormValues } from "./schemas"; // Adjust the import path as needed
+import { FormValues } from "../../../utils/schemas"; // Adjust the import path as needed
 
 const ContactInfo = ({
   clearErrors,

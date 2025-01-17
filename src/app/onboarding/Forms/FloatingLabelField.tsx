@@ -17,7 +17,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 
-import { FormValues } from "./schemas"; // Adjust the import path as needed
+import { FormValues } from "../../../utils/schemas"; // Adjust the import path as needed
 
 interface FloatingLabelFieldProps<T extends Path<FormValues>> {
   name: T;

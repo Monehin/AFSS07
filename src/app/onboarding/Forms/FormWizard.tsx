@@ -16,7 +16,7 @@ import Confirmation from "./Confirmation";
 import ContactInfo from "./ContactInfo"; // Ensure path is correct
 import PersonalInfo from "./PersonalInfo";
 import SocialMediaInfo from "./SocialMediaInfo"; // Updated path
-import { FormValues, formSchema } from "./schemas";
+import { FormValues, formSchema } from "../../../utils/schemas";
 
 export const Onboarding = ({ userId }: { userId: string }) => {
   const [currentStep, setCurrentStep] = useState(0);
