@@ -20,7 +20,6 @@ interface ProfileUpdateInput {
   state?: string | null;
   zip?: string | null;
   imageUrl?: string | null;
-  // For social media
   socialMediaLinks?: { platform: string; url: string }[];
 }
 
