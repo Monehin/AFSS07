@@ -19,7 +19,7 @@ const SocialMediaList = ({
             return (
               <a
                 key={platform}
-                href={url}
+                href={`${media?.basePath}${url}`}
                 target="_blank"
                 rel="noreferrer"
                 style={{ color }}
