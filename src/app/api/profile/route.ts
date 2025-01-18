@@ -1,11 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient, Profile, User } from "@prisma/client";
+import { PrismaClient, Profile, SocialMediaLink, User } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export interface ProfileWithUser extends Profile {
   user: User;
+  socialMediaLinks: SocialMediaLink[];
   error?: string;
 }
 
@@ -22,7 +23,7 @@ export async function GET() {
 
     const profile = await prisma.profile.findUnique({
       where: { userId },
-      include: { user: true },
+      include: { user: true, socialMediaLinks: true },
     });
 
     if (!profile) {

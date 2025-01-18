@@ -2,10 +2,11 @@
 
 import db from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { Profile, User } from "@prisma/client";
+import { Profile, SocialMediaLink, User } from "@prisma/client";
 
 export interface ProfileWithUser extends Profile {
-  user: User;
+  user?: User;
+  socialMediaLinks?: SocialMediaLink[];
 }
 
 interface ProfileResponse {
@@ -23,7 +24,7 @@ export async function getProfile(): Promise<ProfileResponse> {
 
     const profile = await db.profile.findUnique({
       where: { userId },
-      include: { user: true },
+      include: { user: true, socialMediaLinks: true },
     });
     if (profile) {
       return { data: profile };

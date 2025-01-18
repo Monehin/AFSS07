@@ -1,4 +1,5 @@
 "use client";
+import LogoIcon from "@/components/LogoIcon";
 import { platformOptions } from "@/utils/platformOptions";
 import { SocialMediaLink } from "@prisma/client";
 
@@ -8,27 +9,24 @@ const SocialMediaList = ({
   socialMediaLinks: SocialMediaLink[];
 }) => {
   return (
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 items-center">
       {socialMediaLinks && Array.isArray(socialMediaLinks)
         ? socialMediaLinks.map(({ url, platform }: SocialMediaLink) => {
             const media = platformOptions.find(
               (option) => option.id === platform
             );
-            const Icon = media?.icon;
             const color = media?.color;
-            if (Icon) {
-              return (
-                <a
-                  key={platform}
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ color }}
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              );
-            }
+            return (
+              <a
+                key={platform}
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color }}
+              >
+                <LogoIcon icon={platform} />
+              </a>
+            );
           })
         : null}
     </div>

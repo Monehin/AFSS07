@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { updateProfile } from "@/app/actions/updateProfile";
-import { Save, UploadCloud } from "lucide-react";
+import { Save, Trash, UploadCloud } from "lucide-react";
 import {
   Country,
   State,
@@ -37,6 +37,9 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "react-toastify";
+import { platformOptions } from "@/utils/platformOptions";
+import { SocialIcon } from "react-social-icons";
+import LogoIcon from "@/components/LogoIcon";
 
 /* ------------------------------------------------------------------
   Profile Data Interface
@@ -54,6 +57,14 @@ interface ProfileData {
   zip?: string | null;
   country?: string | null;
   imageUrl?: string | null;
+  socialMediaLinks?: SocialMediaLink[];
+}
+
+interface SocialMediaLink {
+  platform: string;
+  url: string;
+  id?: string;
+  userId?: string;
 }
 
 export default function ProfilePageTabs() {
@@ -74,6 +85,7 @@ export default function ProfilePageTabs() {
     zip: "",
     country: "",
     imageUrl: "",
+    socialMediaLinks: [],
   });
   const [originalProfile, setOriginalProfile] = useState<ProfileData>({});
 
@@ -83,6 +95,9 @@ export default function ProfilePageTabs() {
   const [countries, setCountries] = useState<ICountry[]>([]);
   const [states, setStates] = useState<IState[]>([]);
   const [cities, setCities] = useState<ICity[]>([]);
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>(
+    []
+  );
 
   const [isProfileChanged, setIsProfileChanged] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -105,6 +120,19 @@ export default function ProfilePageTabs() {
           const data: ProfileData = await res.json();
           setProfile(data);
           setOriginalProfile(data);
+
+          if (data.socialMediaLinks) {
+            console.log(data.socialMediaLinks);
+            const saveSocialMediaLinks = data.socialMediaLinks.map((link) => {
+              return {
+                platform: link.platform,
+                url: link.url,
+                id: link.id,
+              };
+            });
+
+            setSocialMediaLinks(saveSocialMediaLinks);
+          }
 
           // Initialize location dropdowns
           const fetchedCountry = data.country || "";
@@ -164,6 +192,34 @@ export default function ProfilePageTabs() {
     setCityName("");
   };
 
+  const addField = (platformId: string) => {
+    setSocialMediaLinks((prevLinks) => [
+      ...prevLinks,
+      { platform: platformId, url: "" },
+    ]);
+  };
+  const removeField = (platform: string) => {
+    setSocialMediaLinks((prevLinks) =>
+      prevLinks.filter((link) => link.platform !== platform)
+    );
+  };
+
+  const handleSocialLinkChange = (platform: string, url: string) => {
+    setSocialMediaLinks((prevLinks) => {
+      const existingIndex = prevLinks.findIndex(
+        (link) => link.platform === platform
+      );
+      if (existingIndex > -1) {
+        const updatedLinks = [...prevLinks];
+        updatedLinks[existingIndex] = { platform, url };
+        return updatedLinks;
+      } else {
+        return [...prevLinks, { platform, url }];
+      }
+    });
+    setProfile((prev) => ({ ...prev, socialMediaLinks }));
+  };
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
@@ -215,6 +271,7 @@ export default function ProfilePageTabs() {
         country: countryIso,
         state: stateIso,
         city: cityName,
+        socialMediaLinks,
       };
 
       try {
@@ -230,7 +287,7 @@ export default function ProfilePageTabs() {
         console.error("Error updating profile:", error);
       }
     },
-    [profile, countryIso, stateIso, cityName, router]
+    [profile, countryIso, stateIso, cityName, router, socialMediaLinks]
   );
 
   if (isPending || isFetchingProfile) {
@@ -263,6 +320,7 @@ export default function ProfilePageTabs() {
                 <TabsTrigger value="personal">Personal</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
                 <TabsTrigger value="photo">Photo</TabsTrigger>
+                <TabsTrigger value="social">Social</TabsTrigger>
               </TabsList>
 
               <Separator className="my-4" />
@@ -468,6 +526,109 @@ export default function ProfilePageTabs() {
                   <Button variant="outline" onClick={handleFileClick}>
                     Change Photo
                   </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="social">
+                <div className=" m-4 ">
+                  <div className="flex flex-col justify-center items-center mb-4">
+                    {socialMediaLinks.length <= 4 && (
+                      <p className="text-gray-600  font-medium">
+                        Select Platforms
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex gap-1 md:gap-8 mb-10 flex-wrap justify-center">
+                      {platformOptions.map(({ id, label }) => (
+                        <div
+                          key={id}
+                          className={`flex items-center gap-2 g-x-12 cursor-pointer ${
+                            socialMediaLinks.some(
+                              (field) => field.platform === id
+                            )
+                              ? "hidden"
+                              : ""
+                          }`}
+                          onClick={() => addField(id)}
+                          aria-label={`Add ${label}`}
+                        >
+                          <SocialIcon network={id} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-2 gap-y-6 w-full">
+                    {socialMediaLinks.map((field) => {
+                      const platform = platformOptions.find(
+                        (option) => option.id === field.platform
+                      );
+                      if (!platform) return null;
+
+                      const { label, color, id } = platform;
+
+                      return (
+                        <div
+                          key={field.platform}
+                          className="flex flex-col items-center gap-4 mb-4 md:mb-6 w-full"
+                        >
+                          <div className="relative flex w-full items-center gap-2">
+                            <span className="text-sm  absolute top-[-20] left-[43]">
+                              <a
+                                target="_blank"
+                                href={`${platform.basePath}${field.url}`}
+                                className={`block truncate max-w-[230px] md:max-w-[300px] hover:text-blue-500 ${
+                                  field.url.length
+                                    ? "text-blue-400"
+                                    : " text-gray-400"
+                                }`}
+                                style={{
+                                  pointerEvents: field.url.length
+                                    ? "auto"
+                                    : "none",
+                                }}
+                              >
+                                {`${platform.basePath}${field.url}`}{" "}
+                              </a>
+                            </span>
+                            <div className="">
+                              <div
+                                className=" items-center gap-2"
+                                style={{ color }}
+                              >
+                                {id && (
+                                  <LogoIcon icon={id} width={40} height={40} />
+                                )}
+                              </div>
+                            </div>
+                            <div className="relative  w-full">
+                              <Input
+                                type="text"
+                                placeholder={`Username`}
+                                {...field}
+                                value={field.url || ""}
+                                onChange={(e) => {
+                                  handleSocialLinkChange(id, e.target.value);
+                                }}
+                                className="w-full"
+                              />
+                            </div>
+
+                            <Button
+                              variant="outline"
+                              className="ml-auto"
+                              onClick={() => removeField(id)}
+                              aria-label={`Remove ${label}`}
+                            >
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

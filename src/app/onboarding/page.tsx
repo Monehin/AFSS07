@@ -16,12 +16,17 @@ const page = async () => {
 
   const profile = await getProfile();
 
-  if (profile.data && !profile.data.user.verified) {
-    return <Confirmation />;
-  }
+  const { data } = profile || {};
+  const { user: pUser } = data || {};
 
-  if (profile.data && profile.data.user.verified) {
-    redirect("/");
+  if (user) {
+    if (!pUser?.verified) {
+      return <Confirmation />;
+    }
+
+    if (pUser?.verified) {
+      redirect("/");
+    }
   }
 
   return (
