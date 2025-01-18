@@ -575,7 +575,7 @@ export default function ProfilePageTabs() {
                           className="flex flex-col items-center gap-4 mb-4 md:mb-6 w-full"
                         >
                           <div className="relative flex w-full items-center gap-2">
-                            <span className="text-sm  absolute top-[-20] left-[43]">
+                            <div className="text-sm  absolute top-[-20px] left-[43px]">
                               <a
                                 target="_blank"
                                 href={`${platform.basePath}${field.url}`}
@@ -592,7 +592,7 @@ export default function ProfilePageTabs() {
                               >
                                 {`${platform.basePath}${field.url}`}{" "}
                               </a>
-                            </span>
+                            </div>
                             <div className="">
                               <div
                                 className=" items-center gap-2"
