@@ -94,6 +94,7 @@ export default function ProfilePageTabs() {
     Loading / Fetch States
   ------------------------------------------------------------------ */
   const [isFetchingProfile, setIsFetchingProfile] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   /* ------------------------------------------------------------------
     Profile States
@@ -207,7 +208,6 @@ export default function ProfilePageTabs() {
           setProfile((prev) => ({ ...prev, country: "", state: "", city: "" }));
         }
       } catch (error) {
-        console.error("Error fetching profile:", error);
         toast.error("An error occurred while fetching your profile.");
       } finally {
         setIsFetchingProfile(false);
@@ -301,6 +301,7 @@ export default function ProfilePageTabs() {
   }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSaving(true);
     const file = e.target.files?.[0];
     if (!file) return;
     await uploadImage(file);
@@ -323,6 +324,8 @@ export default function ProfilePageTabs() {
     } catch (error) {
       console.error("Image upload error:", error);
       toast.error("Failed to upload image.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -366,6 +369,7 @@ export default function ProfilePageTabs() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      setIsSaving(true);
 
       // Consolidate final data
       const finalProfile: ProfileData = {
@@ -398,6 +402,8 @@ export default function ProfilePageTabs() {
       } catch (error) {
         console.error("Error updating profile:", error);
         toast.error("An error occurred while updating your profile.");
+      } finally {
+        setIsSaving(false);
       }
     },
     [profile, countryIso, stateIso, cityName, router]
@@ -628,7 +634,11 @@ export default function ProfilePageTabs() {
                     accept="image/*"
                   />
 
-                  <Button variant="outline" onClick={handleFileClick}>
+                  <Button
+                    variant="outline"
+                    onClick={handleFileClick}
+                    disabled={isSaving}
+                  >
                     Change Photo
                   </Button>
                 </div>
@@ -747,7 +757,7 @@ export default function ProfilePageTabs() {
             <Button
               type="submit"
               // Disable if nothing is dirty OR if we haven't finished fetching
-              disabled={!isDirty || isFetchingProfile}
+              disabled={!isDirty || isFetchingProfile || isSaving}
               className="flex items-center"
             >
               <Save className="mr-2 h-4 w-4" />
