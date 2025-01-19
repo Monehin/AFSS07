@@ -13,32 +13,53 @@ import { getCountryName, getDayandMonthDateString } from "@/lib/utils";
 import { Profile, SocialMediaLink, User } from "@prisma/client";
 import debounce from "debounce";
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import JoinRequestList from "./components/JoinRequestList";
 import SearchBar from "./components/SearchBar";
 import SocialMediaList from "./components/SocialMediaList";
-import { ProfileWithUser } from "@/app/actions/getProfile";
+import { useGetAllProfile, useGetUserProfile } from "@/hooks/useQuery";
+import { toast } from "react-toastify";
 
 /** Types & Interfaces */
 interface ExtendedProfile extends Profile {
   socialMediaLinks?: SocialMediaLink[];
   user?: User;
 }
-
-interface HomeProps {
-  verifiedProfiles: ExtendedProfile[];
-  unverifiedProfiles: ExtendedProfile[];
-  userProfile: ProfileWithUser | undefined;
-}
-
 /** Main Home Component */
-const Home = ({
-  verifiedProfiles,
-  unverifiedProfiles,
-  userProfile,
-}: HomeProps) => {
+const Home = () => {
   // State for search query and "is searching" feedback
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [verifiedProfiles, setVerifiedProfiles] = useState<ExtendedProfile[]>(
+    []
+  );
+  const [unverifiedProfiles, setUnverifiedProfiles] = useState<
+    ExtendedProfile[]
+  >([]);
+  const currentUserProfile = useGetUserProfile();
+  const allProfiles = useGetAllProfile();
+
+  const { data: userProfile, error: userProfileError } = currentUserProfile;
+  const { data: allProfilesData, error: allProfilesError } = allProfiles;
+
+  useEffect(() => {
+    if (userProfileError || allProfilesError) {
+      toast.error(
+        userProfileError?.message ||
+          allProfilesError?.message ||
+          "An error occurred"
+      );
+    }
+    if (allProfilesData) {
+      const verified = allProfilesData.filter(
+        (profile) => profile.user?.verified
+      );
+      const unverified = allProfilesData.filter(
+        (profile) => !profile.user?.verified
+      );
+      setVerifiedProfiles(verified);
+      setUnverifiedProfiles(unverified);
+    }
+  }, [allProfilesData, userProfileError, allProfilesError]);
 
   // Debounce the search input to avoid rapid re-renders
   const debouncedSearch = useMemo(

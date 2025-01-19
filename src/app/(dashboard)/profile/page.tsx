@@ -1,16 +1,11 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { updateProfile } from "@/app/actions/updateProfile";
 import { Save, Trash, UploadCloud } from "lucide-react";
+import { ProfileType } from "@/utils/types";
 
 // country-state-city
 import {
@@ -49,37 +44,12 @@ import { toast } from "react-toastify";
 import { platformOptions } from "@/utils/platformOptions";
 import { SocialIcon } from "react-social-icons";
 import LogoIcon from "@/components/LogoIcon";
-
-/* ------------------------------------------------------------------
-  Types & Interfaces
------------------------------------------------------------------- */
-interface SocialMediaLink {
-  platform: string;
-  url: string;
-  id?: string;
-  userId?: string;
-}
-
-interface ProfileData {
-  firstName?: string | null;
-  lastName?: string | null;
-  dob?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  career?: string | null;
-  address?: string | null;
-  city?: string | null;
-  state?: string | null;
-  zip?: string | null;
-  country?: string | null;
-  imageUrl?: string | null;
-  socialMediaLinks?: SocialMediaLink[];
-}
+import { useGetUserProfile } from "@/hooks/useQuery";
 
 /* ------------------------------------------------------------------
   Helper Function for Deep Comparison
 ------------------------------------------------------------------ */
-function profilesAreDifferent(a: ProfileData, b: ProfileData) {
+function profilesAreDifferent(a: ProfileType, b: ProfileType) {
   return JSON.stringify(a) !== JSON.stringify(b);
 }
 
@@ -88,18 +58,16 @@ function profilesAreDifferent(a: ProfileData, b: ProfileData) {
 ------------------------------------------------------------------ */
 export default function ProfilePageTabs() {
   const router = useRouter();
-  const [isPending] = useTransition();
 
   /* ------------------------------------------------------------------
     Loading / Fetch States
   ------------------------------------------------------------------ */
-  const [isFetchingProfile, setIsFetchingProfile] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   /* ------------------------------------------------------------------
     Profile States
   ------------------------------------------------------------------ */
-  const [profile, setProfile] = useState<ProfileData>({
+  const [profile, setProfile] = useState<ProfileType>({
     firstName: "",
     lastName: "",
     dob: "",
@@ -116,7 +84,7 @@ export default function ProfilePageTabs() {
   });
 
   // The "saved" state we compare against.
-  const [originalProfile, setOriginalProfile] = useState<ProfileData>({});
+  const [originalProfile, setOriginalProfile] = useState<ProfileType>({});
 
   // Track if anything has changed
   const [isDirty, setIsDirty] = useState(false);
@@ -131,6 +99,7 @@ export default function ProfilePageTabs() {
   const [countries, setCountries] = useState<ICountry[]>([]);
   const [states, setStates] = useState<IState[]>([]);
   const [cities, setCities] = useState<ICity[]>([]);
+  const userProfile = useGetUserProfile();
 
   /* ------------------------------------------------------------------
     UI States
@@ -151,82 +120,65 @@ export default function ProfilePageTabs() {
   /* ------------------------------------------------------------------
     Fetch & Set Profile
   ------------------------------------------------------------------ */
+
+  const { isLoading, error, data } = userProfile;
+
   useEffect(() => {
-    if (isPending) return;
+    if (data) {
+      setProfile(data);
+      setOriginalProfile(data);
+      const fetchedCountry = data.country || "";
+      const fetchedState = data.state || "";
+      const fetchedCity = data.city || "";
 
-    const fetchProfile = async () => {
-      try {
-        setIsFetchingProfile(true);
-        const res = await fetch("/api/profile");
-        if (!res.ok) {
-          console.error("Failed to fetch profile:", res.statusText);
-          toast.error("Failed to fetch profile.");
-          return;
-        }
-        const data: ProfileData = await res.json();
+      setCountryIso(fetchedCountry);
 
-        // Store both 'profile' and 'originalProfile'
-        setProfile(data);
-        setOriginalProfile(data);
+      if (fetchedCountry) {
+        const loadedStates = State.getStatesOfCountry(fetchedCountry);
+        setStates(loadedStates);
 
-        // Social Media Links are part of profile now, no separate state needed
+        setStateIso(fetchedState);
 
-        // Location
-        const fetchedCountry = data.country || "";
-        const fetchedState = data.state || "";
-        const fetchedCity = data.city || "";
+        if (fetchedState) {
+          const loadedCities = City.getCitiesOfState(
+            fetchedCountry,
+            fetchedState
+          );
+          setCities(loadedCities);
 
-        setCountryIso(fetchedCountry);
-
-        if (fetchedCountry) {
-          const loadedStates = State.getStatesOfCountry(fetchedCountry);
-          setStates(loadedStates);
-
-          setStateIso(fetchedState);
-
-          if (fetchedState) {
-            const loadedCities = City.getCitiesOfState(
-              fetchedCountry,
-              fetchedState
-            );
-            setCities(loadedCities);
-
-            if (loadedCities.some((c) => c.name === fetchedCity)) {
-              setCityName(fetchedCity);
-            } else {
-              setCityName("");
-              // Optionally, reset city in profile if it doesn't exist
-              setProfile((prev) => ({ ...prev, city: "" }));
-            }
+          if (loadedCities.some((c) => c.name === fetchedCity)) {
+            setCityName(fetchedCity);
           } else {
-            setProfile((prev) => ({ ...prev, state: "", city: "" }));
+            setCityName("");
+            // Optionally, reset city in profile if it doesn't exist
+            setProfile((prev) => ({ ...prev, city: "" }));
           }
         } else {
-          setStates([]);
-          setCities([]);
-          setCityName("");
-          setProfile((prev) => ({ ...prev, country: "", state: "", city: "" }));
+          setProfile((prev) => ({ ...prev, state: "", city: "" }));
         }
-      } catch (error) {
-        toast.error("An error occurred while fetching your profile.");
-      } finally {
-        setIsFetchingProfile(false);
+      } else {
+        setStates([]);
+        setCities([]);
+        setCityName("");
+        setProfile((prev) => ({ ...prev, country: "", state: "", city: "" }));
       }
-    };
-
-    fetchProfile();
-  }, [isPending]);
+    } else {
+      if (error) {
+        toast.error("Failed to fetch profile.");
+        return;
+      }
+    }
+  }, [isLoading, data, error]);
 
   /* ------------------------------------------------------------------
     Compare Profile and Original to Set Dirty State
   ------------------------------------------------------------------ */
   useEffect(() => {
-    if (!isFetchingProfile) {
+    if (!isLoading) {
       const changed = profilesAreDifferent(profile, originalProfile);
       setIsDirty(changed);
-      console.log("isDirty set to:", changed);
     }
-  }, [profile, originalProfile, isFetchingProfile]);
+  }, [profile, originalProfile, isLoading]);
 
   /* ------------------------------------------------------------------
     Handlers
@@ -372,7 +324,7 @@ export default function ProfilePageTabs() {
       setIsSaving(true);
 
       // Consolidate final data
-      const finalProfile: ProfileData = {
+      const finalProfile: ProfileType = {
         ...profile,
         country: countryIso,
         state: stateIso,
@@ -412,7 +364,7 @@ export default function ProfilePageTabs() {
   /* ------------------------------------------------------------------
     Conditional Loading
   ------------------------------------------------------------------ */
-  if (isPending || isFetchingProfile) {
+  if (isLoading) {
     return (
       <div className="p-4 text-center">
         <p className="text-gray-600">Loading profile...</p>
@@ -757,7 +709,7 @@ export default function ProfilePageTabs() {
             <Button
               type="submit"
               // Disable if nothing is dirty OR if we haven't finished fetching
-              disabled={!isDirty || isFetchingProfile || isSaving}
+              disabled={!isDirty || isLoading || isSaving}
               className="flex items-center"
             >
               <Save className="mr-2 h-4 w-4" />
