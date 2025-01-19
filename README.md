@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# **AFSS07 Alumni Directory**
 
-First, run the development server:
+## **Overview**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The **AFSS07 Alumni Directory** is a platform designed to bring together members of the Air Force Secondary School Class of 2007. By fostering collaboration, communication, and data-driven organization, this platform is built to serve as a hub for connecting members, sharing information, and planning group activities, while ensuring privacy and data security.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## **Features**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **User Login and Authentication**
+  - Seamless login using **Clerk** with options for Google, Apple, and LinkedIn.
+  - Secure and simple onboarding process for new members.
 
-## Learn More
+- **Member Management**
+  - Centralized member directory to manage profiles and access approvals.
 
-To learn more about Next.js, take a look at the following resources:
+- **Profile Customization**
+  - Personalize profiles with photos, career details, and social media links.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Privacy and Security**
+  - Sensitive data, such as addresses, remains private and accessible only to admins for emergencies.
+  - Public profiles display only essential details to foster connections.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Additional Features**
+  - **Donation Management**: A system to track voluntary contributions and donations transparently.
+  - **Job Board**: A space for sharing job opportunities and professional networking.
+  - **Event Management**: Plan and organize reunions, meetups, and group events with ease.
+  - **Group Announcements**: Share news, updates, and achievements in a structured way.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## **Tech Stack**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Frontend**: [Next.js](https://nextjs.org/) – for server-side rendering and dynamic UI.
+- **Backend**: [Next.js API Routes](https://nextjs.org/docs/api-routes/introduction) – integrated backend services.
+- **Database**: [Neon Serverless Postgres](https://neon.tech/) – scalable and serverless database solution.
+- **Authentication**: [Clerk](https://clerk.dev/) – for secure and robust user authentication.
+
+---
+
+## **Installation**
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Monehin/AFSS-2007.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd AFSS-2007
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Configure environment variables:
+   - Create a `.env.local` file in the root of the project with the following:
+
+     ```env
+     DATABASE_URL=<your-neon-postgres-database-url>
+     CLERK_API_KEY=<your-clerk-api-key>
+     NEXT_PUBLIC_CLERK_FRONTEND_API=<your-clerk-frontend-api>
+     ```
+
+5. Run the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## **Contributing**
+
+We welcome contributions from members to improve the platform!
+
+1. Fork the repository.
+2. Create a new branch for your feature:
+
+   ```bash
+   git checkout -b feature-name
+   ```
+
+3. Commit your changes and push them:
+
+   ```bash
+   git add .
+   git commit -m "Add feature-name"
+   git push origin feature-name
+   ```
+
+4. Submit a pull request for review.
+
+---
+
+## **License**
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+## **Contact**
+
+For questions, feedback, or collaboration, feel free to reach out:
+
+- Repository: [AFSS-2007 on GitHub](https://github.com/Monehin/AFSS-2007)
+- Maintainer: [Emmanuel Monehin](https://github.com/Monehin)
