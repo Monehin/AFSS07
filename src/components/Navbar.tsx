@@ -56,7 +56,7 @@ function DesktopNavbar() {
           <ThemeToggle />
           <div>
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
             </SignedIn>
             <SignedOut>
               <SignInButton />
