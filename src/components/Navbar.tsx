@@ -56,7 +56,7 @@ function DesktopNavbar() {
           <ThemeToggle />
           <div>
             <SignedIn>
-              <UserButton />
+              <UserButton afterSignOutUrl="/" />
             </SignedIn>
             <SignedOut>
               <SignInButton />
@@ -130,7 +130,7 @@ function MobileNavbar() {
             <div className="flex items-center gap-2">
               <div>
                 <SignedIn>
-                  <UserButton />
+                  <UserButton afterSignOutUrl="/" />
                 </SignedIn>
                 <SignedOut>
                   <SignInButton />
@@ -146,7 +146,7 @@ function MobileNavbar() {
           <ThemeToggle />
           <div>
             <SignedIn>
-              <UserButton />
+              <UserButton afterSignOutUrl="/" />
             </SignedIn>
             <SignedOut>
               <SignInButton />
