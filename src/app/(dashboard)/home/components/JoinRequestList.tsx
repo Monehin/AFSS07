@@ -2,7 +2,6 @@
 
 import debounce from "debounce";
 import { useCallback, useMemo, useState } from "react";
-
 import {
   Accordion,
   AccordionContent,
@@ -27,28 +26,7 @@ import { toast } from "react-toastify";
 import { ApproveResponse, verifyProfile } from "../_actions/verifyProfile";
 import SearchBar from "./SearchBar";
 import SocialMediaList from "./SocialMediaList";
-
-const handleApprove = async (id: string) => {
-  if (!id) {
-    toast.error("Invalid user id", { autoClose: 1000 });
-    return;
-  }
-
-  try {
-    const response: ApproveResponse = await verifyProfile(id);
-
-    if (response.error) {
-      throw new Error(response.error);
-    }
-    toast.success("Profile approval was successful", {
-      autoClose: 1000,
-    });
-  } catch (error) {
-    toast.error(`Verification failed: ${error}`, {
-      autoClose: 1000,
-    });
-  }
-};
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ExtendedProfile extends Profile {
   socialMediaLinks?: SocialMediaLink[];
@@ -60,7 +38,13 @@ interface JoinRequestListProps {
 }
 
 /** Card for Mobile/Tablet */
-function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
+function JoinRequestCard({
+  profile,
+  onApprove,
+}: {
+  profile: ExtendedProfile;
+  onApprove: (id: string) => Promise<void>;
+}) {
   const fullName = `${profile.firstName || "First Name"} ${
     profile.lastName || "Last Name"
   }`;
@@ -70,7 +54,6 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
 
   return (
     <div className="relative max-w-md overflow-hidden rounded-md shadow-sm bg-white">
-      {/* Background illustration/pattern */}
       <div
         className="
           absolute
@@ -83,9 +66,7 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
           pointer-events-none
         "
       />
-
       <div className="flex">
-        {/* Left (2/3) - Profile Info */}
         <div className="p-4 w-2/3 space-y-2 relative z-10">
           <div className="flex items-center space-x-3">
             {profile.user?.imageUrl ? (
@@ -116,7 +97,6 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
               </p>
             </div>
           </div>
-
           <div className="text-xs text-gray-700 space-y-1">
             <p>
               <span className="font-medium">Career:</span>{" "}
@@ -128,7 +108,6 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
             </p>
           </div>
         </div>
-
         <div className="w-1/3 p-4 bg-gray-50 flex flex-col items-end justify-between relative z-10 space-y-2">
           {profile.socialMediaLinks && profile.socialMediaLinks.length > 0 ? (
             <div>
@@ -137,10 +116,9 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
           ) : (
             <p className="text-xs text-gray-400">No social media</p>
           )}
-
           <div>
             <button
-              onClick={() => handleApprove(profile.userId)}
+              onClick={() => onApprove(profile.userId)}
               aria-label="Approve join request"
               className="
                 flex items-center gap-1
@@ -163,7 +141,13 @@ function JoinRequestCard({ profile }: { profile: ExtendedProfile }) {
 }
 
 /** Table for Desktop */
-function JoinRequestTable({ profiles }: { profiles: ExtendedProfile[] }) {
+function JoinRequestTable({
+  profiles,
+  onApprove,
+}: {
+  profiles: ExtendedProfile[];
+  onApprove: (id: string) => Promise<void>;
+}) {
   return (
     <Table className="hidden md:table">
       <TableCaption>
@@ -183,52 +167,45 @@ function JoinRequestTable({ profiles }: { profiles: ExtendedProfile[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {profiles.map((profile) => {
-          const fullName = `${profile.firstName || ""} ${
-            profile.lastName || ""
-          }`;
-          return (
-            <TableRow key={profile.id}>
-              <TableCell>{profile.firstName || "N/A"}</TableCell>
-              <TableCell>{profile.lastName || "N/A"}</TableCell>
-              <TableCell>
-                {profile.dob ? getDayandMonthDateString(profile.dob) : "N/A"}
-              </TableCell>
-              <TableCell>{profile.career || "Not specified"}</TableCell>
-              <TableCell>
-                {getCountryName(profile.country) || "Country not specified"}
-              </TableCell>
-              <TableCell>
-                {profile.socialMediaLinks &&
-                profile.socialMediaLinks.length > 0 ? (
-                  <SocialMediaList
-                    socialMediaLinks={profile.socialMediaLinks}
-                  />
-                ) : (
-                  <span className="text-xs text-gray-400">No social media</span>
-                )}
-              </TableCell>
-              <TableCell>
-                <button
-                  onClick={() => handleApprove(profile.userId)}
-                  aria-label={`Approve join request for ${fullName}`}
-                  className="
-                    flex items-center gap-1
-                    px-2 py-1
-                    text-xs text-white
-                    bg-green-600 hover:bg-green-700
-                    transition-colors
-                    rounded-md
-                    shadow
-                  "
-                >
-                  <Check className="h-4 w-4" />
-                  Approve
-                </button>
-              </TableCell>
-            </TableRow>
-          );
-        })}
+        {profiles.map((profile) => (
+          <TableRow key={profile.id}>
+            <TableCell>{profile.firstName || "N/A"}</TableCell>
+            <TableCell>{profile.lastName || "N/A"}</TableCell>
+            <TableCell>
+              {profile.dob ? getDayandMonthDateString(profile.dob) : "N/A"}
+            </TableCell>
+            <TableCell>{profile.career || "Not specified"}</TableCell>
+            <TableCell>
+              {getCountryName(profile.country) || "Country not specified"}
+            </TableCell>
+            <TableCell>
+              {profile.socialMediaLinks &&
+              profile.socialMediaLinks.length > 0 ? (
+                <SocialMediaList socialMediaLinks={profile.socialMediaLinks} />
+              ) : (
+                <span className="text-xs text-gray-400">No social media</span>
+              )}
+            </TableCell>
+            <TableCell>
+              <button
+                onClick={() => onApprove(profile.userId)}
+                aria-label={`Approve join request for ${profile.firstName}`}
+                className="
+                  flex items-center gap-1
+                  px-2 py-1
+                  text-xs text-white
+                  bg-green-600 hover:bg-green-700
+                  transition-colors
+                  rounded-md
+                  shadow
+                "
+              >
+                <Check className="h-4 w-4" />
+                Approve
+              </button>
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );
@@ -237,10 +214,9 @@ function JoinRequestTable({ profiles }: { profiles: ExtendedProfile[] }) {
 export default function JoinRequestList({
   unverifiedProfiles,
 }: JoinRequestListProps) {
-  /** Search-related state */
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Debounce search to reduce rapid re-renders
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
@@ -256,7 +232,6 @@ export default function JoinRequestList({
     [debouncedSearch]
   );
 
-  /** Filter unverified profiles by search */
   const filteredProfiles = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return unverifiedProfiles;
@@ -273,6 +248,32 @@ export default function JoinRequestList({
         .some((field) => field?.toLowerCase().includes(query))
     );
   }, [unverifiedProfiles, searchQuery]);
+
+  const handleApprove = async (id: string) => {
+    if (!id) {
+      toast.error("Invalid user id", { autoClose: 1000 });
+      return;
+    }
+
+    try {
+      const response: ApproveResponse = await verifyProfile(id);
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      // Invalidate queries after approval
+      queryClient.invalidateQueries({ queryKey: ["allProfiles"] });
+
+      toast.success("Profile approval was successful", {
+        autoClose: 1000,
+      });
+    } catch (error) {
+      toast.error(`Verification failed: ${error}`, {
+        autoClose: 1000,
+      });
+    }
+  };
 
   return (
     <Accordion
@@ -293,25 +294,25 @@ export default function JoinRequestList({
           </div>
         </AccordionTrigger>
         <AccordionContent>
-          {/* Subtitle / Summary */}
           <p className="text-sm text-gray-500 mb-4">
             Approve or review new join requests below.
           </p>
-
-          {/* Search Bar & Clear Button */}
           <div className="max-w-md mb-4">
             <SearchBar onSearch={handleSearch} />
           </div>
-
-          {/* Mobile Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
             {filteredProfiles.map((profile) => (
-              <JoinRequestCard key={profile.id} profile={profile} />
+              <JoinRequestCard
+                key={profile.id}
+                profile={profile}
+                onApprove={handleApprove}
+              />
             ))}
           </div>
-
-          {/* Desktop Table */}
-          <JoinRequestTable profiles={filteredProfiles} />
+          <JoinRequestTable
+            profiles={filteredProfiles}
+            onApprove={handleApprove}
+          />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

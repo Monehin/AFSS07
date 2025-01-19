@@ -203,6 +203,7 @@ const ProfileCard = ({ profile }: { profile: ExtendedProfile }) => {
             <p>
               <span className="font-medium">Location:</span>{" "}
               {getCountryName(profile.country) || "Country not specified"}
+              {profile.city && `, ${profile.city}`}
             </p>
           </div>
         </div>
@@ -250,6 +251,7 @@ const ProfileTable = ({ profiles }: { profiles: ExtendedProfile[] }) => {
             <TableCell>{profile.career || "Not specified"}</TableCell>
             <TableCell>
               {getCountryName(profile.country) || "Country not specified"}
+              {profile.city && `, ${profile.city}`}
             </TableCell>
             <TableCell>
               {profile.socialMediaLinks && (
