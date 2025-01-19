@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ClerkProvider afterSignOutUrl={"/sign-in"}>
+      <ClerkProvider afterSignOutUrl={"/"} signInFallbackRedirectUrl="/">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
