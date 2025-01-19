@@ -608,7 +608,7 @@ export default function ProfilePageTabs() {
                       )}
                   </div>
 
-                  <div className="flex gap-1 md:gap-8 mb-10 flex-wrap justify-center">
+                  <div className="flex gap-6 md:gap-8 mb-10 flex-wrap justify-center">
                     {platformOptions.map(({ id, label }) => {
                       const isAlreadyAdded = profile.socialMediaLinks?.some(
                         (link) => link.platform === id
