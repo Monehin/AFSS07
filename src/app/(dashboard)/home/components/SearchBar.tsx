@@ -18,7 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
         type="text"
         placeholder="Search members..."
         onChange={handleInputChange}
-        className="w-full p-2 border border-gray-300 rounded"
+        className="w-full p-2 border border-gray-300 rounded focus:ring-0 focus:outline-none"
       />
     </div>
   );

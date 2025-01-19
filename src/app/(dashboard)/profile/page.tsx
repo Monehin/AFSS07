@@ -643,7 +643,7 @@ export default function ProfilePageTabs() {
                         >
                           <div className="relative flex w-full items-center gap-2 ">
                             {/* Link Preview */}
-                            <div className="text-sm absolute top-[-20px] left-[43px]">
+                            <div className="text-xs absolute top-[-20px] left-[43px]">
                               {field.url ? (
                                 <a
                                   target="_blank"
