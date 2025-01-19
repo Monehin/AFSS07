@@ -29,6 +29,7 @@ const FormSchema = z.object({
   dob: z.preprocess((D) => {
     return D ? new Date(D as Date) : undefined;
   }, z.date().max(new Date(), { message: "Date of birth must be in the past." })),
+  email: z.string().email({ message: "Invalid email address." }),
 });
 
 export function Onboarding({ userId }: { userId: string }) {
@@ -41,6 +42,7 @@ export function Onboarding({ userId }: { userId: string }) {
     defaultValues: {
       country: "",
       dob: date,
+      email: "",
     },
   });
 
@@ -82,12 +84,12 @@ export function Onboarding({ userId }: { userId: string }) {
                 }}
                 value={field.value || ""}
               >
-                <FormControl>
+                <FormControl className="focus:ring-0 focus:outline-none">
                   <SelectTrigger>
                     <SelectValue placeholder="Select a country" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="focus:ring-0 focus:outline-none">
                   {countries.map((country) => (
                     <SelectItem key={country.isoCode} value={country.isoCode}>
                       {country.name}
@@ -112,7 +114,26 @@ export function Onboarding({ userId }: { userId: string }) {
                   id="dob"
                   value={field.value.toString() ?? ""}
                   onChange={(e) => field.onChange(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1"
+                  className="border border-gray-300 rounded px-2 py-1 focus:ring-0 focus:outline-none"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <input
+                  type="email"
+                  id="email"
+                  value={field.value.toString() ?? ""}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="border border-gray-300 rounded px-2 py-1  focus:ring-0 focus:outline-none"
                 />
               </FormControl>
               <FormMessage />

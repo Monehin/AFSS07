@@ -8,25 +8,20 @@ import { getUser } from "../actions/getUser";
 
 const page = async () => {
   const user = await currentUser();
-  await getUser();
-
-  if (!user) {
+  if (user) {
+    await getUser();
+  } else {
     redirect("/sign-in");
   }
 
   const profile = await getProfile();
 
-  const { data } = profile || {};
-  const { user: pUser } = data || {};
+  if (profile.data?.user?.verified) {
+    redirect("/");
+  }
 
-  if (user) {
-    if (!pUser?.verified) {
-      return <Confirmation />;
-    }
-
-    if (pUser?.verified) {
-      redirect("/");
-    }
+  if (profile.data?.country && !profile.data?.user?.verified) {
+    return <Confirmation />;
   }
 
   return (
