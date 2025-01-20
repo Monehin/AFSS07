@@ -13,6 +13,8 @@ export interface ProfileType {
   email?: string | null;
   career?: string | null;
   address?: string | null;
+  bio?: string | null;
+  emergencyContact?: string | null;
   city?: string | null;
   state?: string | null;
   zip?: string | null;

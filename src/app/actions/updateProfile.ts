@@ -15,6 +15,8 @@ interface ProfileUpdateInput {
   email?: string | null;
   career?: string | null;
   address?: string | null;
+  bio?: string | null;
+  emergencyContact?: string | null;
   country?: string | null;
   city?: string | null;
   state?: string | null;
@@ -56,6 +58,8 @@ export async function updateProfile(data: ProfileUpdateInput) {
         country: data.country,
         city: data.city,
         state: data.state,
+        bio: data.bio,
+        emergencyContact: data.emergencyContact,
         zip: data.zip,
         imageUrl: data.imageUrl,
         socialMediaLinks: data.socialMediaLinks

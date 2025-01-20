@@ -74,7 +74,8 @@ export default function ProfilePageTabs() {
     phone: "",
     email: "",
     career: "",
-    address: "",
+    bio: "",
+    emergencyContact: "",
     city: "",
     state: "",
     zip: "",
@@ -292,7 +293,6 @@ export default function ProfilePageTabs() {
         { platform: platformId, url: "" },
       ],
     }));
-    console.log(`Added social media platform: ${platformId}`);
   };
 
   const removeField = (platformId: string) => {
@@ -302,7 +302,6 @@ export default function ProfilePageTabs() {
         (link) => link.platform !== platformId
       ),
     }));
-    console.log(`Removed social media platform: ${platformId}`);
   };
 
   const handleSocialLinkChange = (platform: string, url: string) => {
@@ -312,7 +311,6 @@ export default function ProfilePageTabs() {
         link.platform === platform ? { ...link, url } : link
       ),
     }));
-    console.log(`Updated social link: ${platform} -> ${url}`);
   };
 
   /* ------------------------------------------------------------------
@@ -332,11 +330,8 @@ export default function ProfilePageTabs() {
         // socialMediaLinks is already part of profile
       };
 
-      console.log("Submitting Profile:", finalProfile);
-
       try {
         const res = await updateProfile(finalProfile);
-        console.log("Update Profile Response:", res);
         if (res.data) {
           toast.success("Profile updated successfully!", { autoClose: 1000 });
 
@@ -443,15 +438,6 @@ export default function ProfilePageTabs() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={profile.phone ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="email">Email</Label>
                     <Input
                       type="email"
@@ -461,21 +447,39 @@ export default function ProfilePageTabs() {
                       onChange={handleChange}
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      value={profile.phone ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone"> Emergency Contact</Label>
+                    <Input
+                      id="emergencyContact"
+                      name="emergencyContact"
+                      value={profile.emergencyContact ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      name="bio"
+                      value={profile.bio ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               </TabsContent>
 
               {/* LOCATION TAB */}
               <TabsContent value="location">
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Textarea
-                      id="address"
-                      name="address"
-                      value={profile.address ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="country">Country</Label>
