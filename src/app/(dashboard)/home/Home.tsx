@@ -50,12 +50,22 @@ const Home = () => {
       );
     }
     if (allProfilesData) {
-      const verified = allProfilesData.filter(
-        (profile) => profile.user?.verified
-      );
-      const unverified = allProfilesData.filter(
-        (profile) => !profile.user?.verified
-      );
+      const verified = allProfilesData
+        .filter((profile) => profile.user?.verified)
+        .sort((a, b) => {
+          if (a.firstName && b.firstName) {
+            return a.firstName.localeCompare(b.firstName);
+          }
+          return 0;
+        });
+      const unverified = allProfilesData
+        .filter((profile) => !profile.user?.verified)
+        .sort((a, b) => {
+          if (a.firstName && b.firstName) {
+            return a.firstName.localeCompare(b.firstName);
+          }
+          return 0;
+        });
       setVerifiedProfiles(verified);
       setUnverifiedProfiles(unverified);
     }
