@@ -6,8 +6,6 @@ import Image from "next/image";
 import { updateProfile } from "@/app/actions/updateProfile";
 import { Save, Trash, UploadCloud } from "lucide-react";
 import { ProfileType } from "@/utils/types";
-
-// country-state-city
 import {
   Country,
   State,
@@ -16,8 +14,6 @@ import {
   IState,
   ICity,
 } from "country-state-city";
-
-// shadcn/ui
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
