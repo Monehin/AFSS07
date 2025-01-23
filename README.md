@@ -3,7 +3,7 @@
 
 ## **Overview**
 
-The **AFSS07 Alumni Directory** is a platform designed to bring together members of the Air Force Secondary School Class of 2007. By fostering collaboration, communication, and data-driven organization, this platform is built to serve as a hub for connecting members, sharing information, and planning group activities, while ensuring privacy and data security.
+The **AFSS07 Alumni Directory** is a platform designed to bring together members of the Air Force Secondary School Class of 2007. By fostering collaboration and communication, this platform is built to serve as a hub for connecting members, sharing information, and planning group activities, while ensuring privacy and data security.
 
 ---
 
