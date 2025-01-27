@@ -27,6 +27,7 @@ const Navbar = () => {
 
 const items = [
   { label: "Home", link: "/" },
+  {label: "Excos", link: "/excos" },
   // { label: "Gigs", link: "/gigs" },
   // { label: "Events", link: "/events" },
   // { label: "Pix", link: "/pix" },
