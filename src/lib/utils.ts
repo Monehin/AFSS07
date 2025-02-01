@@ -6,11 +6,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getDayandMonthDateString = (dob: Date | null) => {
+export const getDayandMonthDateString = (dob: Date | string | null) => {
   if (!dob) return "";
   const date = new Date(dob);
-  const month = date.toLocaleString("default", { month: "long" });
-  const day = date.getDate();
+  const day = date.getUTCDate();
+  const month = date.toLocaleString("default", {
+    month: "long",
+    timeZone: "UTC",
+  });
   return `${day} ${month}`;
 };
 
