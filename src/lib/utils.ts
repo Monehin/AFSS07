@@ -7,9 +7,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getDayandMonthDateString = (dob: string | null) => {
+export const getDayandMonthDateString = (dob: Date | string | null) => {
   if (!dob) return "";
-  const dt = DateTime.fromISO(dob, { setZone: true });
+  const options: any = { setZone: true };
+  const dt =
+    typeof dob === "string"
+      ? DateTime.fromISO(dob, options)
+      : DateTime.fromJSDate(dob, options);
   return dt.toFormat("d LLLL");
 };
 
