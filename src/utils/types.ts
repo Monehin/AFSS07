@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+
 export interface SocialMediaLink {
   platform: string;
   url: string;
@@ -21,4 +23,5 @@ export interface ProfileType {
   country?: string | null;
   imageUrl?: string | null;
   socialMediaLinks?: SocialMediaLink[];
+  user?: User;
 }

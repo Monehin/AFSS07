@@ -20,14 +20,11 @@ import SocialMediaList from "./components/SocialMediaList";
 import { useGetAllProfile, useGetUserProfile } from "@/hooks/useQuery";
 import { toast } from "react-toastify";
 
-/** Types & Interfaces */
 interface ExtendedProfile extends Profile {
   socialMediaLinks?: SocialMediaLink[];
   user?: User;
 }
-/** Main Home Component */
 const Home = () => {
-  // State for search query and "is searching" feedback
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [verifiedProfiles, setVerifiedProfiles] = useState<ExtendedProfile[]>(
     []
@@ -71,7 +68,6 @@ const Home = () => {
     }
   }, [allProfilesData, userProfileError, allProfilesError]);
 
-  // Debounce the search input to avoid rapid re-renders
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
@@ -82,13 +78,11 @@ const Home = () => {
 
   const handleSearch = useCallback(
     (query: string) => {
-      // Show “search in progress” feedback
       debouncedSearch(query);
     },
     [debouncedSearch]
   );
 
-  // Filter the verified profiles by search query
   const filteredProfiles = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return verifiedProfiles;
@@ -115,8 +109,7 @@ const Home = () => {
           Welcome, {userProfile.firstName} 👋
         </h1>
       ) : null}
-      {/* Join Request List */}
-      {unverifiedProfiles.length > 0 && (
+      {userProfile?.user?.role === "ADMIN" && unverifiedProfiles.length > 0 && (
         <div className="mb-8">
           <JoinRequestList unverifiedProfiles={unverifiedProfiles} />
         </div>
