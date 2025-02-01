@@ -59,7 +59,7 @@ model Profile {
   updatedAt        DateTime          @updatedAt
   user             User              @relation("UserProfile", fields: [userId], references: [clerkUserId], onDelete: Cascade)
   userId           String            @unique
-  socialMediaLinks SocialMediaLink[] // Replace Json? with a relation
+  socialMediaLinks SocialMediaLink[]
 }
 
 model SocialMediaLink {
