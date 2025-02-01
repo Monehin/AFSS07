@@ -19,6 +19,7 @@ import SearchBar from "./components/SearchBar";
 import SocialMediaList from "./components/SocialMediaList";
 import { useGetAllProfile, useGetUserProfile } from "@/hooks/useQuery";
 import { toast } from "react-toastify";
+import ClipLoader from "react-spinners/ClipLoader";
 
 interface ExtendedProfile extends Profile {
   socialMediaLinks?: SocialMediaLink[];
@@ -35,8 +36,16 @@ const Home = () => {
   const currentUserProfile = useGetUserProfile();
   const allProfiles = useGetAllProfile();
 
-  const { data: userProfile, error: userProfileError } = currentUserProfile;
-  const { data: allProfilesData, error: allProfilesError } = allProfiles;
+  const {
+    data: userProfile,
+    error: userProfileError,
+    isLoading: isLoadingUserProfile,
+  } = currentUserProfile;
+  const {
+    data: allProfilesData,
+    error: allProfilesError,
+    isLoading: isLoadingAllProfiles,
+  } = allProfiles;
 
   useEffect(() => {
     if (userProfileError || allProfilesError) {
@@ -100,6 +109,14 @@ const Home = () => {
         .some((field) => field?.toLowerCase().includes(query))
     );
   }, [verifiedProfiles, searchQuery]);
+
+  if (isLoadingUserProfile || isLoadingAllProfiles) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <ClipLoader color="#10B981" loading={true} size={50} />
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-6 space-y-6">
