@@ -1,20 +1,16 @@
 import { clsx, type ClassValue } from "clsx";
 import { Country } from "country-state-city";
 import { twMerge } from "tailwind-merge";
+import { DateTime } from "luxon";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getDayandMonthDateString = (dob: Date | string | null) => {
+export const getDayandMonthDateString = (dob: string | null) => {
   if (!dob) return "";
-  const date = new Date(dob);
-  const day = date.getUTCDate();
-  const month = date.toLocaleString("default", {
-    month: "long",
-    timeZone: "UTC",
-  });
-  return `${day} ${month}`;
+  const dt = DateTime.fromISO(dob, { setZone: true });
+  return dt.toFormat("d LLLL");
 };
 
 export const getCountryName = (iso: string | null) => {
