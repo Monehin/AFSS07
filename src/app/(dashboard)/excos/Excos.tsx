@@ -26,7 +26,7 @@ const excos = [
     role: "Public Relations Officer",
     name: "Adedotun Somoye",
     icon: <Megaphone size={40} className="text-yellow-500" />,
-    gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeHEwOWk5MWdvMW01eDRpNXp3aWo4aDEwa2oyank3Y2MzbnNncjFxNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DXprwGXvaiRrrUA8zc/giphy.gif",
+    gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcG9tbHllYmR0bTZ5b3FrbG5hcWIwYTYyZzQ0bzVkeHYwN3c5Y252MiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2Y8Iq3xe121Ba3hUAM/giphy.gif",
   },
 ];
 
