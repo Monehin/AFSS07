@@ -1,9 +1,9 @@
-import Home from "./home/Home";
+import Excos from "./Excos";
 
 const page = async () => {
   return (
     <div className="w-full">
-      <Home />
+      <Excos />
     </div>
   );
 };

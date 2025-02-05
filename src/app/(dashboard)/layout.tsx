@@ -10,8 +10,10 @@ const layout = async ({ children }: { children: ReactNode }) => {
   }
   return (
     <div className="relative flex h-screen w-full flex-col">
-      <Navbar />
-      <div className="flex flex-col justify-center items-center mt-8">
+      <div className="mb-20">
+        <Navbar />
+      </div>
+      <div className="flex flex-col justify-center items-center">
         {children}
       </div>
     </div>

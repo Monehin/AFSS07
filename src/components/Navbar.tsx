@@ -27,18 +27,18 @@ const Navbar = () => {
 
 const items = [
   { label: "Home", link: "/" },
-  {label: "Excos", link: "/excos" },
+  { label: "My Profile", link: "/profile" },
+  { label: "Guidelines", link: "/guidelines" },
+  { label: "Excos", link: "/excos" },
   // { label: "Gigs", link: "/gigs" },
   // { label: "Events", link: "/events" },
   // { label: "Pix", link: "/pix" },
   // { label: "Pulse", link: "/pulse" },
   // { label: "Donation", link: "/donation" },
-  { label: "My Profile", link: "/profile" },
 ];
-
 function DesktopNavbar() {
   return (
-    <div className="hidden md:flex border-separate border-b bg-background">
+    <div className="w-full fixed top-0 z-50 hidden md:flex border-separate border-b bg-background">
       <nav className="flex w-full items-center justify-between px-8">
         <h2 className="text-lg font-extrabold">AFSS07</h2>
 
@@ -105,7 +105,7 @@ function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="block border-separate bg-background md:hidden">
+    <div className="w-full fixed top-0 z-50 block border-separate bg-background md:hidden">
       <nav className="container flex items-center justify-between px-8">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
