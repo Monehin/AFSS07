@@ -10,7 +10,9 @@ export function cn(...inputs: ClassValue[]) {
 export const getDayandMonthDateString = (dob: Date | string | null) => {
   if (!dob) return "";
   const dt =
-    typeof dob === "string" ? DateTime.fromISO(dob) : DateTime.fromJSDate(dob);
+    typeof dob === "string"
+      ? DateTime.fromISO(dob, { zone: "utc" })
+      : DateTime.fromJSDate(dob);
   return dt.toFormat("d LLLL");
 };
 
