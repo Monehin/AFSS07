@@ -11,8 +11,8 @@ export const getDayandMonthDateString = (dob: Date | string | null) => {
   if (!dob) return "";
   const dt =
     typeof dob === "string"
-      ? DateTime.fromISO(dob, { zone: "utc" }) // Force UTC
-      : DateTime.fromJSDate(dob).setZone("utc"); // Convert Date object to UTC
+      ? DateTime.fromISO(dob, { zone: "utc" })
+      : DateTime.fromJSDate(dob).setZone("utc");
 
   return dt.toFormat("d LLLL");
 };

@@ -9,7 +9,7 @@ const SocialMediaList = ({
   socialMediaLinks: SocialMediaLink[];
 }) => {
   return (
-    <div className="flex space-x-2 items-center">
+    <div className="flex flex-wrap gap-x-2 gap-y-3">
       {socialMediaLinks && Array.isArray(socialMediaLinks)
         ? socialMediaLinks.map(({ url, platform }: SocialMediaLink) => {
             const media = platformOptions.find(
