@@ -229,9 +229,9 @@ const ProfileCard = ({ profile }: { profile: ExtendedProfile }) => {
         </div>
 
         {/* Right (1/3) - Additional Info / Social Links */}
-        <div className="w-1/3 p-4 bg-gray-50 flex flex-col items-end justify-between relative z-10 space-y-2">
+        <div className="w-1/3 p-4 bg-gray-50 flex flex-col  justify-between relative z-10 space-y-2">
           {profile.socialMediaLinks && profile.socialMediaLinks.length > 0 ? (
-            <div>
+            <div className="flex justify-start">
               <SocialMediaList socialMediaLinks={profile.socialMediaLinks} />
             </div>
           ) : (
