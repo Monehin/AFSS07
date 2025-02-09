@@ -20,12 +20,13 @@ The **AFSS07 Alumni Directory** is a platform designed to bring together members
   - Personalize profiles with photos, career details, and social media links.
 
 - **Privacy and Security**
-  - Sensitive data, such as addresses, remains private and accessible only to admins for emergencies.
   - Public profiles display only essential details to foster connections.
 
 - **Feature ideas**
-  - **Donation Management**: A system to track voluntary contributions and donations transparently.
+  - **Book Club**: Feature for sharing book recommendations
   - **Job Board**: A space for sharing job opportunities and professional networking.
+  - **Automation**: Feature to automate some operation for the group 
+  - **Donation Management**: A system to track voluntary contributions and donations transparently.
   - **Event Management**: Plan and organize reunions, meetups, and group events with ease.
   - **Group Announcements**: Share news, updates, and achievements in a structured way.
 
