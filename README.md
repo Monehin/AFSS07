@@ -110,5 +110,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For questions, feedback, or collaboration, feel free to reach out:
 
-- Repository: [AFSS-2007 on GitHub](https://github.com/Monehin/AFSS-2007)
 - Maintainer: [Emmanuel Monehin](https://github.com/Monehin)
