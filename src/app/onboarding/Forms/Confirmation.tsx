@@ -19,8 +19,8 @@ const Confirmation = () => {
           Account Created!
         </h2>
         <p className="text-sm text-gray-700 mb-2">
-          Your account is almost ready. Please ask someone in the WhatsApp group
-          to approve your join request.
+          Your account is almost ready. Please reach out to the group EXCO for
+          approval of your join request.
         </p>
         <p className="text-xs text-gray-500">
           This ensures our community remains exclusive and secure.
