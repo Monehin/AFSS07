@@ -26,7 +26,6 @@ The **AFSS07 Alumni Directory** is a platform designed to bring together members
   - **Book Club**: Feature for sharing book recommendations
   - **Job Board**: A space for sharing job opportunities and professional networking.
   - **Automation**: Feature to automate some operation for the group 
-  - **Donation Management**: A system to track voluntary contributions and donations transparently.
   - **Event Management**: Plan and organize reunions, meetups, and group events with ease.
   - **Group Announcements**: Share news, updates, and achievements in a structured way.
 
