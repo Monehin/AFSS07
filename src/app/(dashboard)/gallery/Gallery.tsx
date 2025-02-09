@@ -18,15 +18,33 @@ import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
 import Image from "next/image";
 
+// The type for each image used in the UI
 interface Picture {
   id: string;
   src: string;
   alt: string;
+  created_at?: string;
 }
 
-// A simple fetcher for SWR; you can add caching options here if needed.
-const fetcher = (url: string) =>
-  fetch(url, { cache: "force-cache" }).then((res) => res.json());
+// The type for the API response from /api/gallery
+interface GalleryResponse {
+  resources: {
+    public_id: string;
+    secure_url: string;
+    created_at?: string;
+  }[];
+}
+
+// The type expected from your upload endpoint
+interface UploadResponse {
+  public_id?: string;
+  url: string;
+  created_at?: string;
+}
+
+// A fetcher that always gets fresh data and returns a GalleryResponse
+const fetcher = (url: string): Promise<GalleryResponse> =>
+  fetch(url, { cache: "no-cache" }).then((res) => res.json());
 
 export default function AlumniGallery() {
   const currentUserProfile = useGetUserProfile();
@@ -40,28 +58,35 @@ export default function AlumniGallery() {
     currentUserProfile;
   const isAdmin = userProfile?.user?.role === "ADMIN";
 
-  // Use SWR to fetch gallery data (which will be cached automatically)
+  // Fetch gallery data using SWR with the proper type
   const {
     data: galleryData,
     error: galleryError,
     mutate,
-  } = useSWR("/api/gallery", fetcher, { revalidateOnFocus: false });
+  } = useSWR<GalleryResponse>("/api/gallery", fetcher, {
+    revalidateOnFocus: false,
+  });
 
-  // Transform the fetched data into our Picture type
+  // Map the API data to our Picture type and sort by created_at (if available)
   const pictures: Picture[] = galleryData
-    ? galleryData.resources.map(
-        ({
-          public_id,
-          secure_url,
-        }: {
-          public_id: string;
-          secure_url: string;
-        }) => ({
-          id: public_id,
-          src: secure_url,
-          alt: "",
+    ? galleryData.resources
+        .map(
+          ({ public_id, secure_url, created_at }): Picture => ({
+            id: public_id,
+            src: secure_url,
+            alt: "",
+            created_at,
+          })
+        )
+        .sort((a: Picture, b: Picture) => {
+          if (a.created_at && b.created_at) {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          }
+          return 0;
         })
-      )
     : [];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,30 +108,34 @@ export default function AlumniGallery() {
         body: formData,
       });
       if (!res.ok) throw new Error("Failed to upload image.");
-      const data = await res.json();
+      const data: UploadResponse = await res.json();
       toast.success("Image uploaded successfully!", { autoClose: 1000 });
 
-      // Optimistically update the gallery cache
-      mutate(
-        (
-          currentData:
-            | { resources: { public_id: string; secure_url: string }[] }
-            | undefined
-        ) => {
-          if (!currentData) return currentData;
+      // Create a new image object using the upload response.
+      const newImage = {
+        public_id: data.public_id || "123",
+        secure_url: data.url,
+        created_at: data.created_at || new Date().toISOString(),
+      };
+
+      // Optimistically update the gallery cache by prepending the new image.
+      await mutate(
+        (currentData: GalleryResponse | undefined): GalleryResponse => {
+          if (!currentData || !currentData.resources) {
+            return { resources: [newImage] };
+          }
           return {
             ...currentData,
-            resources: [
-              ...currentData.resources,
-              {
-                public_id: data.public_id || "123", // Use actual public_id from data if available
-                secure_url: data.url,
-              },
-            ],
+            resources: [newImage, ...currentData.resources],
           };
         },
         false
-      );
+      ); // Do not immediately revalidate
+
+      // Delay revalidation to allow Cloudinary time to update its index.
+      setTimeout(() => {
+        mutate();
+      }, 3000);
 
       setFile(null);
     } catch (error) {
@@ -126,14 +155,12 @@ export default function AlumniGallery() {
       if (!res.ok) throw new Error("Failed to delete image.");
       toast.success("Image deleted successfully!");
 
-      // Optimistically update the gallery cache after deletion
-      mutate(
+      // Optimistically remove the deleted image.
+      await mutate(
         (
-          currentData:
-            | { resources: { public_id: string; secure_url: string }[] }
-            | undefined
-        ) => {
-          if (!currentData) return currentData;
+          currentData: GalleryResponse | undefined
+        ): GalleryResponse | undefined => {
+          if (!currentData || !currentData.resources) return currentData;
           return {
             ...currentData,
             resources: currentData.resources.filter(
@@ -143,6 +170,10 @@ export default function AlumniGallery() {
         },
         false
       );
+
+      setTimeout(() => {
+        mutate();
+      }, 3000);
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete image.");
@@ -167,10 +198,10 @@ export default function AlumniGallery() {
         )}
       </div>
 
-      {/* Uploader Panel (only visible in edit mode) */}
+      {/* Uploader Panel (visible only in edit mode) */}
       {isAdmin && !isLoadingUserProfile && isEditing && (
         <div className="mb-6 p-6 border rounded-lg shadow-lg bg-gray-100 max-w-md mx-auto transition-all duration-300">
-          {/* Drag & Drop / Clickable File Selection Area */}
+          {/* Drag & Drop / Clickable File Selection */}
           <div
             className="flex flex-col items-center cursor-pointer"
             onDragOver={(e) => {
@@ -213,7 +244,6 @@ export default function AlumniGallery() {
             className="hidden"
             onChange={handleFileChange}
           />
-          {/* Upload button placed outside the clickable drag area */}
           <div className="mt-4 self-center text-center">
             <Button onClick={handleUpload} disabled={!file || isUploading}>
               {isUploading ? "Uploading..." : "Upload"}
@@ -231,6 +261,10 @@ export default function AlumniGallery() {
         <div className="flex items-center justify-center h-40">
           <ClipLoader size={40} color="#10B981" />
         </div>
+      ) : pictures.length === 0 ? (
+        <div className="text-center text-gray-500">
+          No image is uploaded yet.
+        </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {pictures.map((pic) => (
@@ -239,7 +273,7 @@ export default function AlumniGallery() {
               className="relative cursor-pointer"
               onClick={() => setSelectedImage(pic)}
             >
-              {/* Show delete button only when editing */}
+              {/* Delete button for admin editing */}
               {isAdmin && isEditing && (
                 <Button
                   variant="destructive"

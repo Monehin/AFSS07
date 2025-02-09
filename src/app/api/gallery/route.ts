@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const result = await cloudinary.search
       .expression("folder:AFSS07_PHOTO_GALLERY")
-      .sort_by("public_id", "desc")
+      .sort_by("created_at", "desc")
       .max_results(30)
       .execute();
 
