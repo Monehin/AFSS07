@@ -118,6 +118,10 @@ const Home = () => {
     );
   }
 
+  const canApprove =
+    userProfile?.user?.role === "ADMIN" ||
+    userProfile?.user?.role === "MODERATOR";
+
   return (
     <div className="px-4 py-6 space-y-6 mx-4 md:mx-20">
       {" "}
@@ -126,7 +130,7 @@ const Home = () => {
           Welcome, {userProfile.firstName} 👋
         </h1>
       ) : null}
-      {userProfile?.user?.role === "ADMIN" && unverifiedProfiles.length > 0 && (
+      {canApprove && unverifiedProfiles.length > 0 && (
         <div className="mb-8">
           <JoinRequestList unverifiedProfiles={unverifiedProfiles} />
         </div>
