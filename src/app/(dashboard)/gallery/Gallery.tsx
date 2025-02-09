@@ -1,9 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useGetUserProfile } from "@/hooks/useQuery";
-import { UploadCloud, Trash } from "lucide-react"; // Added Trash icon for deletion
+import { UploadCloud, Trash } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,49 +24,45 @@ interface Picture {
   alt: string;
 }
 
+// A simple fetcher for SWR; you can add caching options here if needed.
+const fetcher = (url: string) =>
+  fetch(url, { cache: "force-cache" }).then((res) => res.json());
+
 export default function AlumniGallery() {
   const currentUserProfile = useGetUserProfile();
   const [selectedImage, setSelectedImage] = useState<Picture | null>(null);
-  const [pictures, setPictures] = useState<Picture[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [isLoadingImages, setIsLoadingImages] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data: userProfile, isLoading: isLoadingUserProfile } =
     currentUserProfile;
   const isAdmin = userProfile?.user?.role === "ADMIN";
 
-  useEffect(() => {
-    fetchImages();
-  }, []);
+  // Use SWR to fetch gallery data (which will be cached automatically)
+  const {
+    data: galleryData,
+    error: galleryError,
+    mutate,
+  } = useSWR("/api/gallery", fetcher, { revalidateOnFocus: false });
 
-  const fetchImages = async () => {
-    try {
-      setIsLoadingImages(true);
-      const response = await fetch("/api/gallery");
-      if (!response.ok) throw new Error("Failed to fetch images.");
-      const data = await response.json();
-      setPictures(
-        data.resources.map(
-          ({
-            public_id,
-            secure_url,
-          }: {
-            public_id: string;
-            secure_url: string;
-          }) => ({
-            id: public_id,
-            src: secure_url,
-            alt: "",
-          })
-        )
-      );
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoadingImages(false);
-    }
-  };
+  // Transform the fetched data into our Picture type
+  const pictures: Picture[] = galleryData
+    ? galleryData.resources.map(
+        ({
+          public_id,
+          secure_url,
+        }: {
+          public_id: string;
+          secure_url: string;
+        }) => ({
+          id: public_id,
+          src: secure_url,
+          alt: "",
+        })
+      )
+    : [];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
@@ -87,14 +85,29 @@ export default function AlumniGallery() {
       if (!res.ok) throw new Error("Failed to upload image.");
       const data = await res.json();
       toast.success("Image uploaded successfully!", { autoClose: 1000 });
-      setPictures((prev) => [
-        ...prev,
-        {
-          id: data.public_id || "123", // Use actual public_id from data if available
-          src: data.url,
-          alt: "Uploaded Alumni Image",
+
+      // Optimistically update the gallery cache
+      mutate(
+        (
+          currentData:
+            | { resources: { public_id: string; secure_url: string }[] }
+            | undefined
+        ) => {
+          if (!currentData) return currentData;
+          return {
+            ...currentData,
+            resources: [
+              ...currentData.resources,
+              {
+                public_id: data.public_id || "123", // Use actual public_id from data if available
+                secure_url: data.url,
+              },
+            ],
+          };
         },
-      ]);
+        false
+      );
+
       setFile(null);
     } catch (error) {
       console.error(error);
@@ -104,7 +117,6 @@ export default function AlumniGallery() {
     }
   };
 
-  // New delete handler (only accessible by admin)
   const handleDelete = async (picture: Picture) => {
     if (!window.confirm("Are you sure you want to delete this image?")) return;
     try {
@@ -113,7 +125,24 @@ export default function AlumniGallery() {
       });
       if (!res.ok) throw new Error("Failed to delete image.");
       toast.success("Image deleted successfully!");
-      setPictures((prev) => prev.filter((pic) => pic.id !== picture.id));
+
+      // Optimistically update the gallery cache after deletion
+      mutate(
+        (
+          currentData:
+            | { resources: { public_id: string; secure_url: string }[] }
+            | undefined
+        ) => {
+          if (!currentData) return currentData;
+          return {
+            ...currentData,
+            resources: currentData.resources.filter(
+              (resource) => resource.public_id !== picture.id
+            ),
+          };
+        },
+        false
+      );
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete image.");
@@ -122,31 +151,83 @@ export default function AlumniGallery() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">
+      {/* Header */}
+      <h3 className="text-3xl font-bold mb-6 text-center">
         Alumni Photo Gallery
-      </h1>
-
-      {isAdmin && !isLoadingUserProfile && (
-        <div className="mb-6 p-6 border rounded-lg shadow-lg bg-gray-100 max-w-md mx-auto">
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Upload New Picture
-          </h2>
-          <label className="border border-dashed border-gray-400 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
-            <UploadCloud className="h-10 w-10 text-gray-500 mb-2" />
-            <span className="text-gray-600 text-sm">Click to upload</span>
-            <Input type="file" className="hidden" onChange={handleFileChange} />
-          </label>
+      </h3>
+      <div className="flex items-center justify-end mb-2">
+        {isAdmin && !isLoadingUserProfile && (
           <Button
-            className="mt-4 w-full"
-            onClick={handleUpload}
-            disabled={!file || isUploading}
+            variant="outline"
+            onClick={() => setIsEditing((prev) => !prev)}
+            className="h-10"
           >
-            {isUploading ? "Uploading..." : "Upload"}
+            {isEditing ? "Done" : "Edit Gallery"}
           </Button>
+        )}
+      </div>
+
+      {/* Uploader Panel (only visible in edit mode) */}
+      {isAdmin && !isLoadingUserProfile && isEditing && (
+        <div className="mb-6 p-6 border rounded-lg shadow-lg bg-gray-100 max-w-md mx-auto transition-all duration-300">
+          {/* Drag & Drop / Clickable File Selection Area */}
+          <div
+            className="flex flex-col items-center cursor-pointer"
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                setFile(e.dataTransfer.files[0]);
+              }
+            }}
+            onClick={() =>
+              document.getElementById("upload-file-input")?.click()
+            }
+          >
+            <UploadCloud className="h-10 w-10 text-gray-500 mb-2" />
+            {file ? (
+              <span className="text-green-600 text-sm font-medium">
+                File added: {file.name}
+              </span>
+            ) : (
+              <span
+                className={`text-sm ${
+                  isDragging ? "text-blue-600" : "text-gray-600"
+                }`}
+              >
+                Drag &amp; drop a file here, or click to select one
+              </span>
+            )}
+          </div>
+          <Input
+            id="upload-file-input"
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          {/* Upload button placed outside the clickable drag area */}
+          <div className="mt-4 self-center text-center">
+            <Button onClick={handleUpload} disabled={!file || isUploading}>
+              {isUploading ? "Uploading..." : "Upload"}
+            </Button>
+          </div>
         </div>
       )}
 
-      {isLoadingImages ? (
+      {/* Gallery */}
+      {galleryError ? (
+        <div className="text-center text-red-500">
+          Failed to load images. Please try again.
+        </div>
+      ) : !galleryData ? (
         <div className="flex items-center justify-center h-40">
           <ClipLoader size={40} color="#10B981" />
         </div>
@@ -158,7 +239,8 @@ export default function AlumniGallery() {
               className="relative cursor-pointer"
               onClick={() => setSelectedImage(pic)}
             >
-              {isAdmin && (
+              {/* Show delete button only when editing */}
+              {isAdmin && isEditing && (
                 <Button
                   variant="destructive"
                   size="sm"
@@ -188,6 +270,7 @@ export default function AlumniGallery() {
         </div>
       )}
 
+      {/* Modal for Enlarged Image */}
       {selectedImage && (
         <Dialog open={true} onOpenChange={() => setSelectedImage(null)}>
           <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center" />
