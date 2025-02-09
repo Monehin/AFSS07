@@ -10,11 +10,12 @@ export interface SocialMediaLink {
 export interface ProfileType {
   firstName?: string | null;
   lastName?: string | null;
-  dob?: string | null;
+  dob?: Date | string | null;
   phone?: string | null;
   email?: string | null;
   career?: string | null;
   address?: string | null;
+  advice?: string | null;
   bio?: string | null;
   emergencyContact?: string | null;
   city?: string | null;

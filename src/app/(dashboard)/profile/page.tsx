@@ -72,6 +72,7 @@ export default function ProfilePageTabs() {
     career: "",
     bio: "",
     emergencyContact: "",
+    advice: "",
     city: "",
     state: "",
     zip: "",
@@ -420,7 +421,7 @@ export default function ProfilePageTabs() {
                       type="date"
                       id="dob"
                       name="dob"
-                      value={profile.dob?.slice(0, 10) ?? ""}
+                      value={(profile.dob as string)?.slice(0, 10) ?? ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -461,12 +462,24 @@ export default function ProfilePageTabs() {
                       onChange={handleChange}
                     />
                   </div>
+                </div>
+                <Separator className="mt-8 mb-4" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="bio">Bio</Label>
                     <Textarea
                       id="bio"
                       name="bio"
                       value={profile.bio ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="advice">Advise to the group</Label>
+                    <Textarea
+                      id="advice"
+                      name="advice"
+                      value={profile.advice ?? ""}
                       onChange={handleChange}
                     />
                   </div>

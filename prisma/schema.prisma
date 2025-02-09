@@ -50,6 +50,7 @@ model Profile {
   career           String?
   address          String?
   bio              String?
+  advice           String?
   emergencyContact String?
   country          String?
   city             String?

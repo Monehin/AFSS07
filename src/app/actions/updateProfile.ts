@@ -1,31 +1,13 @@
 "use server";
 
+import { ProfileType } from "@/utils/types";
 import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
-// Define exactly which fields we allow in the request
-interface ProfileUpdateInput {
-  firstName?: string | null;
-  lastName?: string | null;
-  dob?: Date | string | null;
-  phone?: string | null;
-  email?: string | null;
-  career?: string | null;
-  address?: string | null;
-  bio?: string | null;
-  emergencyContact?: string | null;
-  country?: string | null;
-  city?: string | null;
-  state?: string | null;
-  zip?: string | null;
-  imageUrl?: string | null;
-  socialMediaLinks?: { platform: string; url: string }[];
-}
-
-export async function updateProfile(data: ProfileUpdateInput) {
+export async function updateProfile(data: ProfileType) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -57,6 +39,7 @@ export async function updateProfile(data: ProfileUpdateInput) {
         address: data.address,
         country: data.country,
         city: data.city,
+        advice: data.advice,
         state: data.state,
         bio: data.bio,
         emergencyContact: data.emergencyContact,
