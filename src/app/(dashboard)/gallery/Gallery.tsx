@@ -152,8 +152,8 @@ export default function AlumniGallery() {
   return (
     <div className="container mx-auto p-6">
       {/* Header */}
-      <h3 className="text-3xl font-bold mb-6 text-center">
-        Alumni Photo Gallery
+      <h3 className="text-2xl font-bold mb-6 text-center">
+        AFSS07 Photo Gallery
       </h3>
       <div className="flex items-center justify-end mb-2">
         {isAdmin && !isLoadingUserProfile && (
