@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useGetUserProfile } from "@/hooks/useQuery";
-import { UploadCloud, Trash } from "lucide-react";
+import { UploadCloud, Trash, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -112,9 +112,10 @@ export default function AlumniGallery() {
       toast.success("Image uploaded successfully!", { autoClose: 1000 });
 
       // Create a new image object using the upload response.
-      const newImage = {
-        public_id: data.public_id || "123",
-        secure_url: data.url,
+      const newImage: Picture = {
+        id: data.public_id || "123",
+        src: data.url,
+        alt: "",
         created_at: data.created_at || new Date().toISOString(),
       };
 
@@ -122,15 +123,30 @@ export default function AlumniGallery() {
       await mutate(
         (currentData: GalleryResponse | undefined): GalleryResponse => {
           if (!currentData || !currentData.resources) {
-            return { resources: [newImage] };
+            return {
+              resources: [
+                {
+                  public_id: newImage.id,
+                  secure_url: newImage.src,
+                  created_at: newImage.created_at,
+                },
+              ],
+            };
           }
           return {
             ...currentData,
-            resources: [newImage, ...currentData.resources],
+            resources: [
+              {
+                public_id: newImage.id,
+                secure_url: newImage.src,
+                created_at: newImage.created_at,
+              },
+              ...currentData.resources,
+            ],
           };
         },
         false
-      ); // Do not immediately revalidate
+      );
 
       // Delay revalidation to allow Cloudinary time to update its index.
       setTimeout(() => {
@@ -178,6 +194,26 @@ export default function AlumniGallery() {
       console.error(error);
       toast.error("Failed to delete image.");
     }
+  };
+
+  // Helper functions for modal navigation (next/prev)
+  const getCurrentImageIndex = (): number =>
+    selectedImage
+      ? pictures.findIndex((pic) => pic.id === selectedImage.id)
+      : -1;
+
+  const showNextImage = () => {
+    const currentIndex = getCurrentImageIndex();
+    if (currentIndex === -1) return;
+    const nextIndex = (currentIndex + 1) % pictures.length;
+    setSelectedImage(pictures[nextIndex]);
+  };
+
+  const showPrevImage = () => {
+    const currentIndex = getCurrentImageIndex();
+    if (currentIndex === -1) return;
+    const prevIndex = (currentIndex - 1 + pictures.length) % pictures.length;
+    setSelectedImage(pictures[prevIndex]);
   };
 
   return (
@@ -266,61 +302,73 @@ export default function AlumniGallery() {
           No image is uploaded yet.
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-7">
           {pictures.map((pic) => (
             <Card
               key={pic.id}
-              className="relative cursor-pointer"
+              className="relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
               onClick={() => setSelectedImage(pic)}
             >
-              {/* Delete button for admin editing */}
-              {isAdmin && isEditing && (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2 z-10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(pic);
-                  }}
-                >
-                  <Trash size={16} />
-                </Button>
-              )}
-              <CardContent className="p-2">
+              <CardContent className="p-2 flex justify-center items-center relative">
                 <Image
                   src={pic.src}
                   alt={pic.alt}
-                  className="w-full h-auto object-cover rounded-lg"
-                  width={200}
-                  height={200}
+                  width={150}
+                  height={150}
+                  className="object-contain rounded-lg filter transition duration-300 ease-in-out hover:brightness-110 hover:contrast-125"
                 />
-                <p className="text-center mt-2 text-sm text-gray-600">
-                  {pic.alt}
-                </p>
+                {isAdmin && isEditing && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 p-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(pic);
+                    }}
+                  >
+                    <Trash size={16} />
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Modal for Enlarged Image */}
+      {/* Modal for Enlarged Image with Next/Prev Buttons */}
       {selectedImage && (
         <Dialog open={true} onOpenChange={() => setSelectedImage(null)}>
-          <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center" />
-          <DialogContent className="bg-white p-4 rounded-lg shadow-lg max-w-lg w-full flex flex-col items-center">
+          <DialogOverlay className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center" />
+          <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-lg shadow-xl max-w-lg w-full flex flex-col items-center max-h-[90vh] overflow-y-auto">
             <DialogTitle>
               <VisuallyHidden.Root>Enlarged Image</VisuallyHidden.Root>
             </DialogTitle>
-            <Image
-              src={selectedImage.src}
-              alt="Enlarged"
-              className="max-w-full max-h-[80vh] rounded-lg"
-              width={0}
-              height={0}
-              sizes="100vw"
-              style={{ width: "100%", height: "auto" }}
-            />
+            <div className="relative w-full flex justify-center items-center">
+              <Image
+                src={selectedImage.src}
+                alt="Enlarged"
+                className="rounded-lg transition-transform duration-300 ease-in-out transform"
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: "100%", height: "auto" }}
+              />
+              {/* Prev Button */}
+              <button
+                onClick={showPrevImage}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-200"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              {/* Next Button */}
+              <button
+                onClick={showNextImage}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-200"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
           </DialogContent>
         </Dialog>
       )}
