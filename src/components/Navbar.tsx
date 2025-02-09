@@ -32,7 +32,7 @@ const items = [
   { label: "Excos", link: "/excos" },
   // { label: "Gigs", link: "/gigs" },
   // { label: "Events", link: "/events" },
-  // { label: "Pix", link: "/pix" },
+  { label: "Memz", link: "/memz" },
   // { label: "Pulse", link: "/pulse" },
   // { label: "Donation", link: "/donation" },
 ];
