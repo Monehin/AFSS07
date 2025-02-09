@@ -27,12 +27,12 @@ const Navbar = () => {
 
 const items = [
   { label: "Home", link: "/" },
+  { label: "Gallery", link: "/gallery" },
   { label: "My Profile", link: "/profile" },
   { label: "Guidelines", link: "/guidelines" },
   { label: "Excos", link: "/excos" },
   // { label: "Gigs", link: "/gigs" },
   // { label: "Events", link: "/events" },
-  { label: "Memz", link: "/memz" },
   // { label: "Pulse", link: "/pulse" },
   // { label: "Donation", link: "/donation" },
 ];
